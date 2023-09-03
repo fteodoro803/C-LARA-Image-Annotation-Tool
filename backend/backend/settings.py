@@ -37,15 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Django Post_App for backend Image Storage
+    # Django PostApp for backend Image Storage
     'rest_framework',
     'corsheaders',
-    'post_app'
+    'PostApp'
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',    # Middleware for Post_App
-    'django.middleware.common.CommonMiddleware',    # Middleware for Post_App
+    'corsheaders.middleware.CorsMiddleware',    # Middleware for PostApp
+    'django.middleware.common.CommonMiddleware',    # Middleware for PostApp
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
