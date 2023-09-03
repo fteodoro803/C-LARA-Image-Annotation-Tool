@@ -1,6 +1,5 @@
 from django.shortcuts import render
 
-#~test(1)
 from .serializers import PostSerializer
 from .models import Post
 from rest_framework.views import APIView
@@ -10,7 +9,7 @@ from rest_framework import status
 
 # Create your views here.
 
-#~test(1)
+# Getters and Setters for JSON Data
 class PostView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
