@@ -6,8 +6,11 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics
 from .models import Word
 from django.http import JsonResponse
+from .serializers import WordSerializer
+from django.db.models import Count
 
 import json #~note test
 
@@ -58,3 +61,13 @@ class PostView(APIView):
         else:
             print('error', posts_serializer.errors)
             return Response(posts_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class WordListView(generics.ListAPIView):
+    queryset = Word.objects.all()   # gets all words
+    serializer_class = WordSerializer
+
+    # Returns distinct Words in Database
+    # def list(self, request):
+    #     queryset = self.get_queryset()
+    #     words = set(word.word for word in queryset)
+    #     return Response({'words': list(words)})

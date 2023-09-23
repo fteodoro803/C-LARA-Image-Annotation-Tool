@@ -1,0 +1,3 @@
+- getting distinct words is currently front-end based. I think its better if it's backend based so all the processing is there
+    - currently the database is sqlite, which may not support the functions we need (distinct, adding groups, removing groups, etc)
+       - we may need to swap the database to postrgres or something
