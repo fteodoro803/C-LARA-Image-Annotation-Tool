@@ -33,3 +33,6 @@ inspired by photo editing software, such as: Draw, Erase and Detect.
 - [Language and Reading Assistant (LARA)](https://www.unige.ch/callector/lara)
 - [Uploading images to Django REST API backend in React JS](https://medium.com/@cole_ruche/uploading-images-to-rest-api-backend-in-react-js-b931376b5833)
 - [Segment Anything](https://github.com/facebookresearch/segment-anything)
+
+## Reminders
+- Reset db in settings.py
