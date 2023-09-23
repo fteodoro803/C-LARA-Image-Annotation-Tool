@@ -1,0 +1,33 @@
+-- ACCESS SHELL --
+python manage.py shell
+
+
+
+-- IMPORT APP --
+from PostApp.models import Post, Word
+
+
+
+-- SAMPLE: ADD WORDS AND COORDINATES --
+from PostApp.models import Post, Word
+
+word1 = Word.objects.create(word="example1", coordinates=[0, 0])
+word2 = Word.objects.create(word="example2", coordinates=[5, 5])
+
+post = Post.objects.create(imageName="sample_image", imageLocation="path/to/image.jpg")
+
+post.words.add(word1, word2)
+
+
+
+-- ADD MORE COORDINATES TO A WORD IN A POST --
+selected_word = Word.objects.create(word='example1', coordinates=[1, 1])
+selected_word.save()
+
+
+
+-- PRINT WORDS --
+print(post.words.all())
+
+-- EXIT SHELL --
+exit()
