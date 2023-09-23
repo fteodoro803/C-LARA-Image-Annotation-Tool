@@ -1,3 +1,4 @@
+### DJANGO SHELL ###
 -- ACCESS SHELL --
 python manage.py shell
 
@@ -7,8 +8,11 @@ python manage.py shell
 from PostApp.models import Post, Word
 
 
+JSON Location: http://127.0.0.1:8000/api/posts/
 
--- SAMPLE: ADD WORDS AND COORDINATES --
+
+
+-- ADD NEW WORD AND COORDINATES TO A POST --
 from PostApp.models import Post, Word
 
 word1 = Word.objects.create(word="example1", coordinates=[0, 0])
@@ -28,6 +32,16 @@ selected_word.save()
 
 -- PRINT WORDS --
 print(post.words.all())
+
+
+
+-- PRINT ALL WORDS AND COORDINATES --
+all_words = Word.objects.all()
+
+for word in all_words:
+    print(f"Word: {word.word}, Coordinates: {word.coordinates}")
+
+
 
 -- EXIT SHELL --
 exit()
