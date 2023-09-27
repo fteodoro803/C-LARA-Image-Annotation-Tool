@@ -11,6 +11,7 @@ function App() {
   const [showMapToolPage, setShowMapToolPage] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(null); // Track selected image index
   const [editedWords, setEditedWords] = useState([...enteredWords]);
+  const [selectedImages, setSelectedImages] = useState([]); // Maintain a list of selected image indexes
 
   function handleImageChange(event) {
     const selectedFiles = event.target.files;
@@ -52,6 +53,23 @@ function App() {
     setShowMapToolPage(false);
   }
 
+  // Function to toggle the selection status of an image
+  const handleImageSelect = (index) => {
+    if (selectedImages.includes(index)) {
+      setSelectedImages(selectedImages.filter((selected) => selected !== index));
+    } else {
+      setSelectedImages([...selectedImages, index]);
+    }
+  };
+
+  // Function to delete selected images
+  const handleDeleteSelected = () => {
+    const updatedFiles = files.filter((_, index) => !selectedImages.includes(index));
+    setSelectedImages([]);
+    setFiles(updatedFiles);
+    // You may also want to update associated data like enteredWords accordingly.
+  };
+
 
   return (
     <div className="App">
@@ -68,8 +86,13 @@ function App() {
           <input type="file" multiple onChange={handleImageChange} />
           <div className="image-container">
             {files.map((url, index) => (
+              <div key = {index} className = "image-item">
+                <input 
+                   type = "checkbox"
+                   checked= {selectedImages.includes(index)}
+                   onChange = {()=> handleImageSelect(index)}
+                 />
               <img
-                key={index}
                 src={url}
                 alt={`Uploaded ${index}`}
                 style={{
@@ -80,8 +103,15 @@ function App() {
                 }}
                 onClick={() => setSelectedImageIndex(index)} // Set selected image index
               />
+            </div>
             ))}
           </div>
+
+          {selectedImages.length > 0 && (
+       <div>
+        <button onClick={handleDeleteSelected}>Delete Selected</button>
+       </div>
+      )}  
 
           <h2>Enter Text:</h2>
           <input type="text" value={inputText} onChange={handleInputChange} />
