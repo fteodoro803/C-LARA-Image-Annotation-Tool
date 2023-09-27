@@ -1,12 +1,16 @@
 import React, { useState } from "react";
-import './App.css';
-import ImageDetailPage from "./ImageDetailPage"; // Import the new component
+import "./App.css";
+import ImageDetailPage from "./ImageDetailPage";
+import MapToolPage from "./MapToolPage";
 
 function App() {
   const [files, setFiles] = useState([]);
   const [inputText, setInputText] = useState("");
   const [enteredWords, setEnteredWords] = useState([]);
-  const [showDetailPage, setShowDetailPage] = useState(false); // Add state for showing the detail page
+  const [showDetailPage, setShowDetailPage] = useState(false);
+  const [showMapToolPage, setShowMapToolPage] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null); // Track selected image index
+  const [editedWords, setEditedWords] = useState([...enteredWords]);
 
   function handleImageChange(event) {
     const selectedFiles = event.target.files;
@@ -25,7 +29,7 @@ function App() {
     console.log("Uploaded Images:", files);
     console.log("Input Text:", inputText);
 
-    const wordsArray = inputText.split(",").map(word => word.trim());
+    const wordsArray = inputText.split(",").map((word) => word.trim());
     setEnteredWords(wordsArray);
   }
 
@@ -33,27 +37,54 @@ function App() {
     setShowDetailPage(true);
   }
 
+  function handleShowMapToolClick(index) {
+    setSelectedImageIndex(index);
+    setShowMapToolPage(true);
+  }
+
+  function handleSaveClick() {
+    setEnteredWords(editedWords);
+    setShowMapToolPage(false);
+  }
+
+  function handleBackClick() {
+    setEditedWords([...enteredWords]);
+    setShowMapToolPage(false);
+  }
+
+
   return (
     <div className="App">
       {showDetailPage ? (
-        <ImageDetailPage images={files} enteredWords={enteredWords} /> 
+        <ImageDetailPage
+          images={files}
+          enteredWords={enteredWords}
+          onShowMapToolClick={handleShowMapToolClick}
+          setSelectedImageIndex={setSelectedImageIndex}
+        />
       ) : (
         <div>
           <h2>Upload Images:</h2>
           <input type="file" multiple onChange={handleImageChange} />
           <div className="image-container">
-                {files.map((url, index) => (
-                    <img
-                        key={index}
-                        src={url}
-                        alt={`Uploaded ${index}`}
-                        style={{ maxWidth: "200px", maxHeight: "200px", width: "auto", height: "auto" }}
-                    />
-                ))}
-            </div>
+            {files.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                alt={`Uploaded ${index}`}
+                style={{
+                  maxWidth: "200px",
+                  maxHeight: "200px",
+                  width: "auto",
+                  height: "auto",
+                }}
+                onClick={() => setSelectedImageIndex(index)} // Set selected image index
+              />
+            ))}
+          </div>
 
-            <h2>Enter Text:</h2>
-            <input type="text" value={inputText} onChange={handleInputChange} />
+          <h2>Enter Text:</h2>
+          <input type="text" value={inputText} onChange={handleInputChange} />
           <button onClick={handleDoneClick}>Done</button>
           {enteredWords.length > 0 && (
             <div>
@@ -69,6 +100,15 @@ function App() {
           )}
           <button onClick={handleProceedClick}>Proceed</button>
         </div>
+      )}
+
+      {showMapToolPage && selectedImageIndex !== null && (
+        <MapToolPage
+          selectedImage={files[selectedImageIndex]}
+          enteredWords={enteredWords}
+          onSaveClick={handleSaveClick}
+          onBackClick={handleBackClick}
+        />
       )}
     </div>
   );

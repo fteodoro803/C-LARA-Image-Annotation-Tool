@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import MapToolPage from "./MapToolPage";
 
 function ImageDetailPage({ images, enteredWords }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [editingIndex, setEditingIndex] = useState(-1);
   const [editedWords, setEditedWords] = useState([...enteredWords]);
+  const [showMapTool, setShowMapTool] = useState(false); // State to control showing the Map Tool
 
   const handleImageClick = (index) => {
     setSelectedImage(index);
@@ -32,6 +34,17 @@ function ImageDetailPage({ images, enteredWords }) {
     }
   };
 
+  const handleMapToolClick = () => {
+    setShowMapTool(true);
+  };
+
+  const handleSaveClick = () => {
+    setShowMapTool(false);
+  };
+
+  const handleBackClick = () => {
+  };
+
   return (
     <div className="image-detail-container">
       <div className="image-list">
@@ -45,7 +58,7 @@ function ImageDetailPage({ images, enteredWords }) {
           />
         ))}
       </div>
-      {selectedImage !== null && (
+      {selectedImage !== null && !showMapTool && (
         <div className="image-detail">
           <div className="selected-image-container">
             <img
@@ -58,7 +71,9 @@ function ImageDetailPage({ images, enteredWords }) {
             <button className="edit-button" onClick={handleEditButtonClick}>
               Edit Words
             </button>
-            <button className="edit-button">Map Tool</button>
+            <button className="edit-button" onClick={handleMapToolClick}>
+              Map Tool
+            </button>
           </div>
           <div className="word-container">
             {editedWords.map((word, index) => (
@@ -81,6 +96,14 @@ function ImageDetailPage({ images, enteredWords }) {
             ))}
           </div>
         </div>
+      )}
+      {showMapTool && (
+        <MapToolPage
+          selectedImage={images[selectedImage]}
+          enteredWords={editedWords}
+          onSaveClick={handleSaveClick}
+          onBackClick={handleBackClick}
+        />
       )}
     </div>
   );
