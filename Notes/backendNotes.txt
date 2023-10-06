@@ -1,5 +1,7 @@
-JSON Location: http://127.0.0.1:8000/api/posts/
-
+- JSON Location: http://127.0.0.1:8000/api/posts/
+- Make each Word have their own Database of Coordinates
+    - the one we have now, is for the full json file. They should be modularised while editing, and only merged for output
+    - no need for the word coordinate pair code bc each word will be looked at in isolation. just need to change the target databaseaq
 
 ### DJANGO SHELL ###
 -- ACCESS SHELL --
@@ -12,9 +14,7 @@ from PostApp.models import Post, Word
 
 
 
--- ADD NEW WORD AND COORDINATES TO A POST --
-from PostApp.models import Post, Word
-
+-- ADD NEW WORDS AND COORDINATES TO A POST --
 word1 = Word.objects.create(word="example1", coordinates=[0, 0])
 word2 = Word.objects.create(word="example2", coordinates=[5, 5])
 
@@ -24,10 +24,14 @@ post.words.add(word1, word2)
 
 
 
--- ADD MORE COORDINATES TO A WORD IN A POST --
-selected_word = Word.objects.create(word='example1', coordinates=[1, 1])
-selected_word.save()
+-- DELETE WORD --
+Word.objects.filter(word='sample_word').delete()
 
+-- DELETE COORDINATE --
+Word.objects.filter(coordinates=[100,100]).delete()
+
+-- DELETE WORD COORDINATE PAIR --
+Word.objects.filter(word='TEST', coordinates=[4,4]).delete()
 
 
 -- PRINT WORDS --
@@ -35,13 +39,18 @@ print(post.words.all())
 
 
 
--- PRINT ALL WORDS AND COORDINATES --
+-- PRINT ALL/DISTINCT WORDS AND COORDINATES --
 all_words = Word.objects.all()
 
 for word in all_words:
     print(f"Word: {word.word}, Coordinates: {word.coordinates}")
 
 
+-- TEST
+all_words = Word.objects.all().distinct('word')
+
+for word in all_words:
+    print(f"Word: {word.word}")
 
 -- EXIT SHELL --
 exit()
