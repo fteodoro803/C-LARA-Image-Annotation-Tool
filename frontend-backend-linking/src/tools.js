@@ -131,10 +131,6 @@ export function DeleteCoordinateForm() {
 
     return (
         <div>
-            {/*<label>*/}
-            {/*    Word:*/}
-            {/*    <input type="text" value={word} onChange={(e) => setWord(e.target.value)} />*/}
-            {/*</label>*/}
             <label>
                 Coordinate (e.g. [1,2]):
                 <input type="text" value={coordinate} onChange={(e) => setCoordinate(e.target.value)} />
@@ -294,6 +290,42 @@ export function ImageDisplay() {
         setSelectedImageSrc(image.imageLocation);
     };
 
+    // For Deleting Images  *NOTE: doesn't work yet
+    // const handleDelete = async () => {
+    //     try {
+    //         // Assuming your backend DELETE endpoint is named "api/delete_image/" and expects the image name.
+    //         const response = await axios.delete(`http://localhost:8000/api/delete_image/${selectedImageName}/`);
+    //
+    //         console.log('Image deleted:', response.data);
+    //
+    //         // Update the local state to remove the deleted image.
+    //         setImages(prevImages => prevImages.filter(img => img.imageName !== selectedImageName));
+    //
+    //         // If there are still images, select the first one, else set to defaults.
+    //         if (images.length > 1) {
+    //             setSelectedImageName(images[1].imageName);
+    //             setSelectedImageSrc(images[1].imageLocation);
+    //         } else {
+    //             setSelectedImageName('');
+    //             setSelectedImageSrc(null);
+    //         }
+    //
+    //     } catch (error) {
+    //         console.error('Error deleting image:', error);
+    //     }
+    // };
+
+    const handleDeleteClick = async () => {
+        try {
+            const response = await axios.post('http://localhost:8000/api/delete_image/', {
+                imageName: selectedImageName
+            });
+            console.log(response.data.message); // This should log "Image deleted"
+        } catch (error) {
+            console.error('Error deleting image:', error);
+        }
+    };
+
     return (
         <div>
             <select value={selectedImageName} onChange={handleDropdownChange}>
@@ -303,8 +335,15 @@ export function ImageDisplay() {
                     </option>
                 ))}
             </select>
+
+            {/* Delete button */}
+            <button onClick={handleDeleteClick} disabled={!selectedImageName}>
+                Delete Selected Image
+            </button>
+
             <br />
             {selectedImageSrc && <img src={`http://localhost:8000${selectedImageSrc}`} alt={selectedImageName} />}
+
         </div>
     );
 }

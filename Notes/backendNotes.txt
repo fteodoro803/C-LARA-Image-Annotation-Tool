@@ -54,3 +54,15 @@ for word in all_words:
 
 -- EXIT SHELL --
 exit()
+
+
+-- CONSIDERATIONS --
+- How to handle multiple words with the same name?
+    - Can't have duplicate entries in the database
+    - Can't have duplicate entries in the json fil
+
+- How to handle multiple words with the same coordinates?
+    - Can't have duplicate entries in the database
+    - Can't have duplicate entries in the json file
+
+- Security Consideration: authentication and authorization in place to ensure that not just anyone can delete images. Depending on your use-case, you might want only logged-in users or even only admins to have the capability to delete images. This can be handled using Django's authentication system and permission classes if you're using Django Rest Framework.

@@ -19,8 +19,7 @@ function App() {
 
   return (
       <div>
-          {/*  Word Selection */}
-          <h2>Select a word:</h2>
+          <h2>Select Word</h2>
           <select>
               {words.map((word, index) => (
                   <option key={index} value={word.word}>{word.word}</option>
@@ -50,7 +49,7 @@ function App() {
           <ImageUploader />
 
           <hr/>
-          <h2>View Select Image from Backend</h2>
+          <h2>Select Image from Backend</h2>
           <ImageDisplay />
 
           <hr/>

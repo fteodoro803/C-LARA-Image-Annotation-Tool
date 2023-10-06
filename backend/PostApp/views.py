@@ -12,6 +12,8 @@ from .models import Word
 from django.http import JsonResponse
 from .serializers import WordSerializer
 from django.db.models import Count
+from django.core.files.storage import default_storage
+
 
 import json #~note test
 
@@ -163,3 +165,33 @@ def list_image_names(request):
     images = Post.objects.all()
     serialized_data = PostSerializer(images, many=True).data
     return Response(serialized_data)
+
+# Delete Image in Backend -- ~note doesn't work yet
+# def delete_image(request, image_name):
+#     if request.method == "DELETE":
+#         try:
+#             # Fetch the image using the provided image name
+#             image = Post.objects.get(imageName=image_name)
+#             image.imageLocation.delete(save=True)  # This will delete the image file itself
+#             image.delete()  # This will delete the database record
+#             return JsonResponse({'status': 'success', 'message': 'Image deleted successfully'}, status=200)
+#         except Post.DoesNotExist:
+#             return JsonResponse({'status': 'failure', 'message': 'Image not found'}, status=404)
+
+
+class DeleteImage(APIView):
+    def post(self, request, *args, **kwargs):
+        image_name_to_delete = request.data.get('imageName')
+
+        # Fetch the image object but don't delete it yet
+        image_obj = Post.objects.filter(imageName=image_name_to_delete).first()
+
+        if image_obj:
+            # Delete the actual image file
+            if default_storage.exists(image_obj.imageLocation.name):
+                default_storage.delete(image_obj.imageLocation.name)
+
+            # Delete the image's record from the database
+            image_obj.delete()
+
+        return Response({'message': 'Image deleted'}, status=status.HTTP_200_OK)
