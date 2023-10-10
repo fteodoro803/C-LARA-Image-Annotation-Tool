@@ -1,109 +1,82 @@
 import React, { useState } from "react";
-import MapToolPage from "./MapToolPage";
+import { useNavigate } from 'react-router-dom';
+import './App.css';
 
 function ImageDetailPage({ images, enteredWords }) {
   const [selectedImage, setSelectedImage] = useState(null);
-  const [editingIndex, setEditingIndex] = useState(-1);
   const [editedWords, setEditedWords] = useState([...enteredWords]);
-  const [showMapTool, setShowMapTool] = useState(false); // State to control showing the Map Tool
+  const [isEditingMode, setIsEditingMode] = useState(false);
+  const navigate = useNavigate();
 
   const handleImageClick = (index) => {
-    setSelectedImage(index);
+    setSelectedImage(images[index]);
+    //navigate("/maptool");
   };
 
   const handleEditButtonClick = () => {
-    setEditingIndex(selectedImage);
-    setEditedWords([...enteredWords]);
+    setIsEditingMode(!isEditingMode);
   };
 
-  const handleWordBubbleClick = (index) => {
-    setEditingIndex(index);
-    setEditedWords([...enteredWords]);
-  };
-
-  const handleWordEdit = (index, editedWord) => {
-    const newWords = [...editedWords];
-    newWords[index] = editedWord;
-    setEditedWords(newWords);
-  };
-
-  const handleWordEditDone = (event, index) => {
-    if (event.key === "Enter") {
-      setEditingIndex(-1);
-      // Save changes to enteredWords or any state you're using
+  const handleWordEditDone = (e, index) => {
+    if (e.key === "Enter") {
+      const newWords = [...editedWords];
+      newWords[index] = e.target.value;
+      setEditedWords(newWords);
+      setIsEditingMode(false);
     }
   };
 
-  const handleMapToolClick = () => {
-    setShowMapTool(true);
-  };
-
-  const handleSaveClick = () => {
-    setShowMapTool(false);
-  };
-
-  const handleBackClick = () => {
-  };
+  const handleMapButtonClick = () => {
+    navigate('/maptool', {
+      state: { 
+        selectedImage: selectedImage,
+        enteredWords: editedWords 
+      }
+    });
+  }
 
   return (
     <div className="image-detail-container">
       <div className="image-list">
         {images.map((url, index) => (
-          <img
-            key={index}
-            src={url}
-            alt={`Uploaded ${index}`}
-            onClick={() => handleImageClick(index)}
-            className={`image-list-item ${selectedImage === index ? "selected" : ""}`}
-          />
+          <div key={index} className="image-box" onClick={() => handleImageClick(index)}>
+            <img src={url} alt={`Uploaded ${index}`} />
+          </div>
         ))}
       </div>
-      {selectedImage !== null && !showMapTool && (
-        <div className="image-detail">
-          <div className="selected-image-container">
-            <img
-              src={images[selectedImage]}
-              alt={`Selected ${selectedImage}`}
-              className="selected-image"
-            />
-          </div>
-          <div className="button-container">
-            <button className="edit-button" onClick={handleEditButtonClick}>
-              Edit Words
-            </button>
-            <button className="edit-button" onClick={handleMapToolClick}>
-              Map Tool
-            </button>
-          </div>
-          <div className="word-container">
-            {editedWords.map((word, index) => (
-              <div
-                key={index}
-                className={`word-box ${editingIndex === index ? "editing" : ""}`}
-                onClick={() => handleWordBubbleClick(index)}
-              >
-                {editingIndex === index ? (
-                  <input
-                    type="text"
-                    value={word}
-                    onChange={(e) => handleWordEdit(index, e.target.value)}
-                    onKeyDown={(e) => handleWordEditDone(e, index)}
-                  />
-                ) : (
-                  word
-                )}
-              </div>
-            ))}
+
+      {selectedImage && (
+        <div className="selected-image-container">
+          <img src={selectedImage} alt="Selected" />
+
+          <div className="controls-container">
+            <button className="edit-button" onClick={handleEditButtonClick}>Edit Words</button>
+
+            {isEditingMode ? (
+              editedWords.map((word, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  value={word}
+                  onChange={(e) => {
+                    const newWords = [...editedWords];
+                    newWords[index] = e.target.value;
+                    setEditedWords(newWords);
+                  }}
+                  onKeyDown={(e) => handleWordEditDone(e, index)}
+                />
+              ))
+            ) : (
+              editedWords.map((word, index) => (
+                <button key={index} onClick={() => setIsEditingMode(true)}>
+                  {word}
+                </button>
+              ))
+            )}
+
+            <button className="map-button" onClick={handleMapButtonClick}>Map Tool</button>
           </div>
         </div>
-      )}
-      {showMapTool && (
-        <MapToolPage
-          selectedImage={images[selectedImage]}
-          enteredWords={editedWords}
-          onSaveClick={handleSaveClick}
-          onBackClick={handleBackClick}
-        />
       )}
     </div>
   );

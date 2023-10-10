@@ -1,0 +1,65 @@
+.map-tool-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 80%; /* Restrict the width */
+    margin: 0 auto; /* Center the container */
+    border: 2px dashed black; /* Outer border */
+    padding: 20px 0; /* Space at the top and bottom */
+}
+
+.top-buttons {
+    display: flex;
+    gap: 10px;
+    background-color: #e0f7fa; /* Teal background color */
+    padding: 10px 20px; /* Spacing around the buttons */
+    border-radius: 5px; /* Rounded edges */
+}
+
+.image-container {
+    border: 2px solid black; /* Image border */
+    width: 80%; /* Adjust this value to your preference */
+    padding: 20px; /* Space inside the border */
+    display: flex;
+    justify-content: center; /* Center the image horizontally */
+}
+
+.image-container img {
+    max-width: 100%; /* Ensure the image doesn't overflow the container */
+}
+
+.word-choice {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%; /* Full width */
+}
+
+.word-choice p {
+    font-weight: bold; /* Bold text for "Choose words:" */
+}
+
+.word-choice button {
+    background-color: #80cbc4; /* Teal button color */
+    color: white; /* Text color */
+    padding: 10px 20px; /* Space inside the button */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded edges */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin: 5px; /* Space between buttons */
+}
+
+.word-choice button:hover, .top-buttons button:hover {
+    background-color: #4caf50; /* Darken the color when hovered */
+}
+
+.top-buttons button {
+    padding: 10px 20px; /* Consistent spacing for buttons */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #80cbc4; /* Teal button color */
+    color: white; /* Text color */
+}

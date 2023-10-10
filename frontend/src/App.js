@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import ImageDetailPage from "./ImageDetailPage";
 import MapToolPage from "./MapToolPage";
 
-function App() {
+function MainApp() {
   const [files, setFiles] = useState([]);
   const [inputText, setInputText] = useState("");
   const [enteredWords, setEnteredWords] = useState([]);
@@ -12,6 +13,16 @@ function App() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(null); // Track selected image index
   const [editedWords, setEditedWords] = useState([...enteredWords]);
   const [selectedImages, setSelectedImages] = useState([]); // Maintain a list of selected image indexes
+  const navigate = useNavigate();
+
+  function handleProceedClick() {
+    navigate("/imagedetail");  // navigate to the imagedetail route
+  }
+
+  function handleShowMapToolClick(index) {
+    setSelectedImageIndex(index);
+    setShowMapToolPage(true);
+  }
 
   function handleImageChange(event) {
     const selectedFiles = event.target.files;
@@ -34,14 +45,7 @@ function App() {
     setEnteredWords(wordsArray);
   }
 
-  function handleProceedClick() {
-    setShowDetailPage(true);
-  }
-
-  function handleShowMapToolClick(index) {
-    setSelectedImageIndex(index);
-    setShowMapToolPage(true);
-  }
+  
 
   function handleSaveClick() {
     setEnteredWords(editedWords);
@@ -72,75 +76,71 @@ function App() {
 
 
   return (
-    <div className="App">
-      {showDetailPage ? (
-        <ImageDetailPage
-          images={files}
-          enteredWords={enteredWords}
-          onShowMapToolClick={handleShowMapToolClick}
-          setSelectedImageIndex={setSelectedImageIndex}
-        />
-      ) : (
-        <div>
-          <h2>Upload Images:</h2>
-          <input type="file" multiple onChange={handleImageChange} />
-          <div className="image-container">
-            {files.map((url, index) => (
-              <div key = {index} className = "image-item">
-                <input 
-                   type = "checkbox"
-                   checked= {selectedImages.includes(index)}
-                   onChange = {()=> handleImageSelect(index)}
-                 />
-              <img
-                src={url}
-                alt={`Uploaded ${index}`}
-                style={{
-                  maxWidth: "200px",
-                  maxHeight: "200px",
-                  width: "auto",
-                  height: "auto",
-                }}
-                onClick={() => setSelectedImageIndex(index)} // Set selected image index
-              />
-            </div>
-            ))}
-          </div>
-
-          {selectedImages.length > 0 && (
-       <div>
-        <button onClick={handleDeleteSelected}>Delete Selected</button>
-       </div>
-      )}  
-
-          <h2>Enter Text:</h2>
-          <input type="text" value={inputText} onChange={handleInputChange} />
-          <button onClick={handleDoneClick}>Done</button>
-          {enteredWords.length > 0 && (
+      <div className="App">
+        <Routes>
+          <Route path="/imagedetail" element={<ImageDetailPage images={files} enteredWords={enteredWords} />} />
+          <Route path="/maptool" element={<MapToolPage selectedImage={files[selectedImageIndex] || ''} enteredWords={enteredWords} />} />
+          <Route path="/" element={
             <div>
-              <h2>Entered Words:</h2>
-              <div className="word-container">
-                {enteredWords.map((word, index) => (
-                  <div key={index} className="word-box">
-                    {word}
+              <h2>Upload Images:</h2>
+              <input type="file" multiple onChange={handleImageChange} />
+              <div className="image-container">
+                {files.map((url, index) => (
+                  <div key={index} className="image-item">
+                    <input
+                      type="checkbox"
+                      checked={selectedImages.includes(index)}
+                      onChange={() => handleImageSelect(index)}
+                    />
+                    <img
+                      src={url}
+                      alt={`Uploaded ${index}`}
+                      style={{
+                        maxWidth: "200px",
+                        maxHeight: "200px",
+                        width: "auto",
+                        height: "auto",
+                      }}
+                      onClick={() => setSelectedImageIndex(index)} // Set selected image index
+                    />
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-          <button onClick={handleProceedClick}>Proceed</button>
-        </div>
-      )}
 
-      {showMapToolPage && selectedImageIndex !== null && (
-        <MapToolPage
-          selectedImage={files[selectedImageIndex]}
-          enteredWords={enteredWords}
-          onSaveClick={handleSaveClick}
-          onBackClick={handleBackClick}
-        />
-      )}
-    </div>
+              {selectedImages.length > 0 && (
+                <div>
+                  <button onClick={handleDeleteSelected}>Delete Selected</button>
+                </div>
+              )}
+
+              <h2>Enter Text:</h2>
+              <input type="text" value={inputText} onChange={handleInputChange} />
+              <button onClick={handleDoneClick}>Done</button>
+              {enteredWords.length > 0 && (
+                <div>
+                  <h2>Entered Words:</h2>
+                  <div className="word-container">
+                    {enteredWords.map((word, index) => (
+                      <div key={index} className="word-box">
+                        {word}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <button onClick={handleProceedClick}>Proceed</button>
+              </div>
+          } />
+        </Routes>
+      </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <MainApp />
+    </Router>
   );
 }
 

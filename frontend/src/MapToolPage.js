@@ -1,152 +1,158 @@
-import React, { useState, useRef, useEffect } from "react";
-import "./MapToolPage.css";
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import './MapTool.css';
 
-function MapToolPage({
-  selectedImage,
-  enteredWords,
-  onSaveClick,
-  onBackClick,
-  onShowCurrentMappingClick,
-  onShowAnnotatedImageSetClick,
-}) {
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [drawingMode, setDrawingMode] = useState("pen");
-  const [canvas, setCanvas] = useState(null);
-  const [context, setContext] = useState(null);
-  const [tempLine, setTempLine] = useState([]);
-  const canvasRef = useRef(null);
+function MapToolPage({ onBackClick }) {
+    const location = useLocation();
+    const selectedImage = location.state?.selectedImage;
+    const enteredWords = location.state?.enteredWords;
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-    setCanvas(canvas);
-    setContext(context);
+    
+    const [actionStack, setActionStack] = useState([]);
+    const [undoStack, setUndoStack] = useState([]);
 
-    // Initialize canvas properties
-    context.strokeStyle = "black";
-    context.lineWidth = 2;
-    context.lineJoin = "round";
-    context.lineCap = "round";
 
-    // Add event listeners for drawing
-    canvas.addEventListener("mousedown", handleMouseDown);
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseup", handleMouseUp);
-    canvas.addEventListener("mouseout", handleMouseOut);
+    const navigate = useNavigate();
 
-    return () => {
-      // Remove event listeners when component unmounts
-      canvas.removeEventListener("mousedown", handleMouseDown);
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      canvas.removeEventListener("mouseup", handleMouseUp);
-      canvas.removeEventListener("mouseout", handleMouseOut);
+    const handleSave = () => {
+        // Implement save logic here
+    }
+
+    const handleDone = () => {
+        // Implement done logic here
+    }
+
+    const handleUndo = () => {
+        if (actionStack.length > 0) {
+            const lastAction = actionStack.pop();
+            undoStack.push(lastAction);
+            setActionStack([...actionStack]);
+            setUndoStack([...undoStack]);
+        }
+    }
+    
+    const handleRedo = () => {
+        if (undoStack.length > 0) {
+            const lastUndoneAction = undoStack.pop();
+            actionStack.push(lastUndoneAction);
+            setActionStack([...actionStack]);
+            setUndoStack([...undoStack]);
+        }
+    }
+    
+
+    const canvasRef = useRef(null);
+    const imageCanvasRef = useRef(null);
+
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [tool, setTool] = useState('');  // '', 'pencil', or 'eraser'
+    const [lines, setLines] = useState([]);
+
+    useEffect(() => {
+        const canvas = imageCanvasRef.current;
+        const context = canvas.getContext('2d');
+        const image = new Image();
+        image.src = selectedImage;
+        image.onload = () => {
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        }
+    }, [selectedImage]);
+    
+
+    const startDrawing = (e) => {
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        context.beginPath();
+        context.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+        setIsDrawing(true);
+    }
+
+    const draw = (e) => {
+        if (!isDrawing || !tool) return;
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        if (tool === 'pencil') {
+            context.lineWidth = 2;
+            context.strokeStyle = 'black';
+            context.lineCap = 'round';
+            context.globalCompositeOperation = 'source-over';
+        } else if (tool === 'eraser') {
+            context.globalCompositeOperation = 'destination-out';
+            context.lineWidth = 10;
+        }
+        context.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+        context.stroke();
+    }
+    
+
+    const stopDrawing = () => {
+        setIsDrawing(false);
+        if (tool === 'pencil') {
+            const canvas = canvasRef.current;
+            const context = canvas.getContext('2d');
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            setLines([...lines, imageData]);
+        }
+    }
+
+    const handleEraser = () => {
+        setTool('eraser');
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        context.putImageData(lines[lines.length - 1], 0, 0);
+    }
+
+
+    const handleBackClick = () => {
+        const userConfirmed = window.confirm("Do you want to save your progress?");
+        if (userConfirmed) {
+            // Save logic here
+            navigate("/imagedetail");
+        } else {
+            navigate("/imagedetail");
+        }
     };
-  }, []);
+    
 
-  useEffect(() => {
-    if (canvas && context) {
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      // Draw existing lines from the JSON data here if available
-    }
-  }, [canvas, context]);
-
-  const handleMouseDown = (e) => {
-    setIsDrawing(true);
-    const x = e.nativeEvent.offsetX;
-    const y = e.nativeEvent.offsetY;
-    setTempLine([{ x, y }]);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDrawing) return;
-    const x = e.nativeEvent.offsetX;
-    const y = e.nativeEvent.offsetY;
-    const newLine = { x, y };
-    setTempLine((prevTempLine) => [...prevTempLine, newLine]);
-  
-    // Draw the line segment on the canvas
-    context.beginPath();
-    context.moveTo(tempLine[0].x, tempLine[0].y); // Use tempLine instead of prevLine
-    context.lineTo(x, y);
-    context.stroke();
-  };
-
-  const handleMouseUp = () => {
-    setIsDrawing(false);
-    if (tempLine.length > 1) {
-      // Save the drawn line to the JSON data or perform any other necessary action
-    }
-    setTempLine([]);
-  };
-
-  const handleMouseOut = () => {
-    if (isDrawing) {
-      setIsDrawing(false);
-      // Handle mouse out event if necessary
-    }
-  };
-
-  const handleSaveClick = () => {
-    // Save the updated mapping data to the backend (implement backend logic)
-    onSaveClick();
-  };
-
-  const handleBackClick = () => {
-    // Navigate back to the previous page (e.g., ImageDetailPage)
-    onBackClick();
-  };
-
-  const handleShowCurrentMapping = () => {
-    // Show the current mapping data (implement display logic)
-    onShowCurrentMappingClick();
-  };
-
-  const handleShowAnnotatedImageSet = () => {
-    // Show the annotated image set (implement display logic)
-    onShowAnnotatedImageSetClick();
-  };
-
-  return (
-    <div className="map-tool-container">
-      <div className="map-tool-image">
-        <img
-          src={selectedImage}
-          alt="Selected Image for Map Tool"
-          className="selected-image"
-        />
-        <canvas
-          ref={canvasRef}
-          width={selectedImage.width}
-          height={selectedImage.height}
-          className="canvas"
-        />
-      </div>
-      <div className="map-tool-text">
-        <h2>Choose words</h2>
-        <div className="word-container">
-          {enteredWords.map((word, index) => (
-            <div key={index} className="word-box">
-              {word}
+    return (
+        <div className="map-tool-container">
+            <div className="top-buttons">
+                <button onClick={handleSave}>Save</button>
+                <button onClick={handleBackClick}>Back</button>
+                <button onClick={handleDone}>Done</button>
+                <button onClick={handleUndo}>⟲</button>
+                <button onClick={handleRedo}>⟳</button>
+                <button onClick={() => setTool('pencil')}>✏️</button>
+                <button onClick={handleEraser}>🧽</button>
             </div>
-          ))}
+
+            <div className="image-container">
+    <canvas 
+        ref={canvasRef} 
+        width={500}  
+        height={500} 
+        style={{ position: 'absolute', zIndex: 1 }}
+        onMouseDown={startDrawing} 
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+    />
+    <canvas 
+        ref={imageCanvasRef} 
+        width={500}
+        height={500}
+        style={{ position: 'relative', zIndex: 0 }}
+    />
+</div>
+
+
+            <div className="word-choice">
+                <p>Choose words:</p>
+                {enteredWords.map((word, index) => (
+                    <button key={index}>{word}</button>
+                ))}
+            </div>
         </div>
-      </div>
-      <div className="map-tool-buttons">
-        <button onClick={handleSaveClick} className="edit-button">
-          Save
-        </button>
-        <button onClick={handleBackClick} className="edit-button">
-          Back
-        </button>
-        <button onClick={handleShowCurrentMapping} className="edit-button">
-          Show current mapping
-        </button>
-        <button onClick={handleShowAnnotatedImageSet} className="edit-button">
-          Show annotated image set
-        </button>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default MapToolPage;
