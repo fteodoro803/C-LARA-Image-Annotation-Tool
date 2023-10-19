@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import UploadImageView, ListImagesView, DeleteImageView, AddWordView, DeleteWordView, ListWordsView, EditWordView
+from .views import UploadImageView, ListImagesView, DeleteImageView, AddWordView, DeleteWordView, ListWordsView, EditWordView, AddCoordinateView, FetchCoordinatesView
 
 urlpatterns = [
     #Images
@@ -13,4 +13,8 @@ urlpatterns = [
     path('add_word/', AddWordView.as_view(), name='add_word'),
     path('delete_word/<int:pk>/', DeleteWordView.as_view(), name='delete_word'),    # note, what is pk
     path('edit_word/<int:word_id>/', EditWordView.as_view(), name='edit_word'),
+
+    # Coordinates
+    path('add_coordinates/', AddCoordinateView.as_view(), name='add_coordinates'),
+    path('coordinates/<int:word_id>/', FetchCoordinatesView.as_view(), name='fetch_coordinates'),
 ]

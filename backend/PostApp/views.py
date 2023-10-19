@@ -105,3 +105,47 @@ class EditWordView(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AddCoordinateView(APIView):
+    def post(self, request, *args, **kwargs):
+        word_id = request.data.get('word_id')
+        new_coordinates = request.data.get('coordinates')
+
+        if word_id:
+            word = Word.objects.get(id=word_id)
+
+            # If new_coordinates is an empty string, set it to an empty list (or maybe an empty table check with Manny) ~note
+            if new_coordinates == None:
+                new_coordinates = []
+
+            # Assuming coordinates is a list of lists
+            word.coordinates = new_coordinates
+
+            word.save()
+            return Response({
+                "message": "Coordinates added successfully!",
+                "word_id": word.id,
+                "coordinates": word.coordinates
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                "message": "Invalid request. Word ID and coordinates are required.",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FetchCoordinatesView(APIView):
+
+    def get(self, request, word_id, format=None):
+        try:
+            word = Word.objects.get(id=word_id)
+            coordinates = word.coordinates if word.coordinates else []
+            return Response({
+                "word_id": word.id,
+                "coordinates": coordinates
+            }, status=status.HTTP_200_OK)
+
+        except Word.DoesNotExist:
+            return Response({
+                "message": "Word not found."
+            }, status=status.HTTP_404_NOT_FOUND)

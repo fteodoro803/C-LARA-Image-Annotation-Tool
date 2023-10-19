@@ -288,3 +288,128 @@ export function WordManager() {
         </div>
     );
 }
+
+
+
+export function CoordinateManager() {
+    const [images, setImages] = useState([]);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [words, setWords] = useState([]);
+    const [selectedWord, setSelectedWord] = useState(null);
+    const [coordinates, setCoordinates] = useState('');
+    const [displayCoordinates, setDisplayCoordinates] = useState('');
+
+
+    // Fetching images when the component loads
+    useEffect(() => {
+        const fetchImages = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/api/images/');
+                setImages(response.data);
+            } catch (error) {
+                console.error("Error fetching images:", error);
+            }
+        };
+        fetchImages();
+    }, []);
+
+    // Fetching words when an image is selected
+    useEffect(() => {
+        if (selectedImage) {
+            const fetchWords = async () => {
+                try {
+                    const response = await axios.get(`http://localhost:8000/api/words/${selectedImage.id}/`);
+                    setWords(response.data);
+                } catch (error) {
+                    console.error("Error fetching words:", error);
+                }
+            };
+            fetchWords();
+        }
+    }, [selectedImage]);
+
+    // Updating coordinates when a word is selected
+    const handleCoordinateUpdate = async () => {
+        try {
+            let parsedCoordinates = null;
+
+            if (coordinates) {
+                try {
+                    parsedCoordinates = JSON.parse(coordinates);
+                } catch (error) {
+                    console.error("Invalid JSON format:", error);
+                    alert("Please enter a valid JSON format for coordinates or leave it blank.");
+                    return;
+                }
+            }
+
+            const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
+                word_id: selectedWord.id,
+                coordinates: parsedCoordinates,
+            });
+
+            console.log("Coordinates updated successfully:", response.data);
+
+            // Update displayed coordinates
+            setDisplayCoordinates(coordinates);
+
+            setCoordinates(''); // Clearing the input field
+        } catch (error) {
+            console.error("Error updating coordinates:", error);
+        }
+    };
+
+    // Fetching coordinates when a word is selected
+    useEffect(() => {
+        if (selectedWord) {
+            fetchCoordinates(selectedWord.id);
+        }
+    }, [selectedWord])
+
+    const fetchCoordinates = async (wordId) => {
+        try {
+            const response = await axios.get(`http://localhost:8000/api/coordinates/${wordId}/`);
+            const coordinates = response.data.coordinates;
+            setDisplayCoordinates(JSON.stringify(coordinates));
+        } catch (error) {
+            console.error("Error fetching coordinates:", error);
+        }
+    };
+
+    return (
+        <div>
+            {/* Dropdown for image selection */}
+            <select onChange={(e) => setSelectedImage(images.find(image => image.id.toString() === e.target.value))}>
+                <option value="" disabled selected>Select an image</option>
+                {images.map(image => (
+                    <option key={image.id} value={image.id}>{image.name}</option>
+                ))}
+            </select>
+
+            {/* Dropdown for word selection */}
+            <select onChange={(e) => setSelectedWord(words.find(word => word.id.toString() === e.target.value))}>
+                <option value="" disabled selected>Select a word</option>
+                {words.map(word => (
+                    <option key={word.id} value={word.id}>{word.word}</option>
+                ))}
+            </select>
+
+            {/* Input and button to update coordinates */}
+            <div>
+                <input
+                    type="text"
+                    value={coordinates}
+                    onChange={(e) => setCoordinates(e.target.value)}
+                    placeholder='[[x1, y1], [x2, y2], ...]'
+                />
+                <button onClick={handleCoordinateUpdate}>Update Coordinates</button>
+            </div>
+
+            {/* Display coordinates */}
+            <div>
+                <label>Coordinates:</label>
+                <span>{displayCoordinates}</span>
+            </div>
+        </div>
+    );
+}

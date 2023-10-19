@@ -3,7 +3,7 @@ from django.db import models
 
 class Word(models.Model):
     word = models.CharField(max_length=255)
-    coordinates = models.JSONField(default=list)
+    coordinates = models.JSONField(default=list, null=True, blank=True)
     imageID = models.ForeignKey('Image', on_delete=models.CASCADE, default=None, blank=True, null=True)
 
     # Our implementation associates words with images, but can be associated with sentences for future extension:

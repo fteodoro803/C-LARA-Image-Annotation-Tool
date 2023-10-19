@@ -15,7 +15,7 @@
 import {
     ImageUploader,
     ImageDisplay,
-    AddWord, WordManager,
+    AddWord, WordManager, CoordinateManager,
 } from "./newTools";
 
 function App() {
@@ -38,6 +38,10 @@ function App() {
           <hr />
           <h2>Word Manager</h2>
           <WordManager />
+
+          <hr/>
+          <h2>Coordinate Manager</h2>
+          <CoordinateManager />
 
           {/*<h2>Adding Words to Backend</h2>*/}
           {/*<WordForm />*/}
