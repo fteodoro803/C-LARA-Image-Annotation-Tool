@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from .serializers import PostSerializer
-from .models import Post
+from .models import ImageSet
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -27,7 +27,7 @@ class PostView(APIView):
     #     serializer = PostSerializer(posts, many=True)
     #     return Response(serializer.data)
     def get(self, request, *args, **kwargs):
-        posts = Post.objects.all()
+        posts = ImageSet.objects.all()
         output = {}
 
         for post in posts:
@@ -85,7 +85,7 @@ class AddWord(APIView):
         coordinate = request.data.get('coordinate')
 
         # Assume you have a Post model instance you want to associate the word with
-        post = Post.objects.first()  # Replace this line with actual logic to get the correct Post instance
+        post = ImageSet.objects.first()  # Replace this line with actual logic to get the correct Post instance
 
         new_word = Word.objects.create(
             word=word_text,
@@ -149,20 +149,20 @@ def upload_image(request):
     image = request.FILES.get('image')
     name = request.data.get('name')
 
-    post = Post.objects.create(imageName=name, imageLocation=image)
+    post = ImageSet.objects.create(imageName=name, imageLocation=image)
     return Response({"message": "Uploaded successfully!", "imageName": post.imageName, "imageLocation": post.imageLocation.url})
 
 # View all images in backend
 @api_view(['GET'])
 def list_images(request):
-    images = Post.objects.all()
+    images = ImageSet.objects.all()
     serialized_data = [{"imageName": img.imageName, "imageLocation": img.imageLocation.url} for img in images]
     return Response(serialized_data)
 
 # Select Image in Backend
 @api_view(['GET'])
 def list_image_names(request):
-    images = Post.objects.all()
+    images = ImageSet.objects.all()
     serialized_data = PostSerializer(images, many=True).data
     return Response(serialized_data)
 
@@ -184,7 +184,7 @@ class DeleteImage(APIView):
         image_name_to_delete = request.data.get('imageName')
 
         # Fetch the image object but don't delete it yet
-        image_obj = Post.objects.filter(imageName=image_name_to_delete).first()
+        image_obj = ImageSet.objects.filter(imageName=image_name_to_delete).first()
 
         if image_obj:
             # Delete the actual image file

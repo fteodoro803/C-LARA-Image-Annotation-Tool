@@ -10,15 +10,6 @@ from django.db import models
 #         return self.word
 
 
-class Post(models.Model):   # delete this later
-    imageName = models.CharField(max_length=100, primary_key=True)
-    imageLocation = models.ImageField(upload_to='images')
-    # words = models.ManyToManyField(Word)
-
-    def __str__(self):
-        return self.imageName
-
-
 class Coordinate(models.Model):
     xValue = models.IntegerField()
     yValue = models.IntegerField()
@@ -51,8 +42,17 @@ class Image(models.Model):
     sentence = models.ForeignKey(Sentence, on_delete=models.CASCADE, default=None, blank=True, null=True)
 
 
-class ImageSet(models.Model):
+class ImageSet(models.Model):   # delete this later
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
+    # words = models.ManyToManyField(Word)
+
+    # def __str__(self):
+    #     return self.imageName
+
+
+# class ImageSet(models.Model):
+#
+
 
 
 # class UserInput(models.Model): # Not used by frontend - delete later
