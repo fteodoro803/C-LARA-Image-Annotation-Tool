@@ -16,8 +16,7 @@ inspired by photo editing software, such as: Draw, Erase and Detect.
 
 ## Running the Program
 #### Frontend:
-1. `cd frontend`
-2. `npm start`
+
 #### Backend: 
 1. `cd backend`
 2. `python manage.py runserver`
