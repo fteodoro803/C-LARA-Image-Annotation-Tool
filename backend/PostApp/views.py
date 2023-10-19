@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from .serializers import PostSerializer
-from .models import ImageSet
+from .models import Image
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -27,34 +27,25 @@ class PostView(APIView):
     #     serializer = PostSerializer(posts, many=True)
     #     return Response(serializer.data)
     def get(self, request, *args, **kwargs):
-        # images = ImageSet.image.all()
-        output = {}
+        images = Image.objects.all()
+        output = []
 
-        # for image in images:
-        #     output[image.imageID] = {}
-        #     segments = []
-        #
-        #     words = image.word.all()  # Get all associated Word objects
-        #
-        #     for word in words:
-        #         similar_words = Word.objects.filter(word=word.word)  # Find all Word objects with the same 'word'
-        #
-        #         coord_list = [list(similar_word.coordinates) for similar_word in
-        #                       similar_words]  # Create list of coordinates
-        #
-        #         # output[post.imageName].append({
-        #         #     word.word: coord_list
-        #         # })
-        #
-        #         segments.append({
-        #             "item": word.word,
-        #             "coordinates": coord_list,
-        #         })
-        #
-        #     output[image.imageName].append({
-        #         "item": word.word,
-        #         "coordinates": coord_list,
-        #     })
+        for image in images:
+            segments = []
+
+            words = Word.objects.filter(imageID=image)  # Get all associated Word objects
+
+            for word in words:
+
+                segments.append({
+                    "item": word.word,
+                    "coordinates": word.coordinates,
+                })
+
+            output.append({
+                    "image_id": image.name,
+                    "segments": segments,
+                })
 
         # with open('output.json', 'w') as f:  #~note test
         #     json.dump(output, f)
