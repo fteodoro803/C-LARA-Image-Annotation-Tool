@@ -11,6 +11,7 @@ python manage.py shell
 
 -- IMPORT APP --
 from PostApp.models import Post, Word
+from PostApp.models import Coordinate, Word, WordCoordinates, Sentence, Image, ImageSet
 
 
 
@@ -19,8 +20,6 @@ word1 = Word.objects.create(word="example1", coordinates=[0, 0])
 word2 = Word.objects.create(word="example2", coordinates=[5, 5])
 
 post = Post.objects.create(imageName="sample_image", imageLocation="path/to/image.jpg")
-
-post.words.add(word1, word2)
 
 
 
@@ -54,6 +53,7 @@ for word in all_words:
 
 -- EXIT SHELL --
 exit()
+
 
 
 -- CONSIDERATIONS --
