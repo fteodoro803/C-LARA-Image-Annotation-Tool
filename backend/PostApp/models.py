@@ -32,21 +32,23 @@ class Sentence(models.Model):
 
 class Image(models.Model):
     name = models.CharField(max_length=255, default=None, blank=True, null=True)
-    location = models.CharField(max_length=255, default=None, blank=True, null=True)
-    imageSetID = models.ForeignKey('ImageSet', on_delete=models.CASCADE, default=None, blank=True, null=True)
+    # location = models.CharField(max_length=255, default=None, blank=True, null=True)
+    file = models.ImageField(default=None, blank=True, null=True)
+    # file = models.ImageField(default=None, blank=True, null=True, upload_to='images/')
+    # imageSetID = models.ForeignKey('ImageSet', on_delete=models.CASCADE, default=None, blank=True, null=True)
 
     def __str__(self):
         return self.name
 
-class ImageSet(models.Model):   # delete this later
-    name = models.CharField(max_length=255, default=None, blank=True, null=True)
-    # words = models.ManyToManyField(Word)
+# class ImageSet(models.Model):   # delete this later
+#     name = models.CharField(max_length=255, default=None, blank=True, null=True)
+#     # words = models.ManyToManyField(Word)
+#
+#     def __str__(self):
+#         return self.name
 
-    def __str__(self):
-        return self.name
 
-
-# class ImageSet(models.Model):
+# class (models.Model):
 #
 
 
