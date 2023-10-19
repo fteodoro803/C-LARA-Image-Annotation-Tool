@@ -10,4 +10,4 @@ class ImageSerializer(serializers.ModelSerializer):
 class WordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Word
-        fields = ('id', 'word', 'imageID')
+        fields = ('id', 'word', 'coordinates', 'imageID')

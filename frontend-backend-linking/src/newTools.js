@@ -229,6 +229,22 @@ export function WordManager() {
         }
     };
 
+    const handleWordEdit = async (wordId, newWord) => {
+        try {
+            const response = await axios.put(`http://localhost:8000/api/edit_word/${wordId}/`, {
+                word: newWord,
+            });
+            console.log("Word edited successfully:", response.data);
+            setWords(prevWords =>
+                prevWords.map(word =>
+                    word.id === wordId ? {...word, word: newWord} : word
+                )
+            );
+        } catch (error) {
+            console.error("Error editing word:", error);
+        }
+    };
+
     return (
         <div>
             {/* Dropdown for image selection */}
@@ -250,11 +266,21 @@ export function WordManager() {
                 <button onClick={handleWordAdd}>Add Word</button>
             </div>
 
-            {/* List of words with delete buttons */}
+            {/* List of words with delete and edit buttons */}
             <div>
                 {words.map(word => (
-                    <div key={word.id}> {/* key is present here */}
+                    <div key={word.id}>
                         {word.word}
+                        <button
+                            onClick={() => {
+                                const newWord = prompt("Edit word:", word.word);
+                                if (newWord) {
+                                    handleWordEdit(word.id, newWord);
+                                }
+                            }}
+                        >
+                            Edit
+                        </button>
                         <button onClick={() => handleWordDelete(word.id)}>Delete</button>
                     </div>
                 ))}

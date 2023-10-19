@@ -90,3 +90,18 @@ class DeleteWordView(DestroyAPIView):
         word = self.get_object()
         word.delete()
         return Response({"message": f"Word '{word.word}' deleted successfully."}, status=status.HTTP_200_OK)
+
+class EditWordView(APIView):
+    def put(self, request, *args, **kwargs):
+        word_id = kwargs.get('word_id')
+        word = get_object_or_404(Word, id=word_id)
+
+        serializer = WordSerializer(word, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "message": "Word updated successfully!",
+                "word": serializer.data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
