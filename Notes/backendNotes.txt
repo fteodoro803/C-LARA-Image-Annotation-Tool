@@ -11,7 +11,7 @@ python manage.py shell
 
 -- IMPORT APP --
 from PostApp.models import Post, Word
-from PostApp.models import Coordinate, Word, WordCoordinates, Sentence, Image, ImageSet
+from PostApp.models import Coordinate, Word, Sentence, TranslationControl, SpeakerControl, Image, ImageSet
 
 
 

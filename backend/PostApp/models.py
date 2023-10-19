@@ -10,44 +10,40 @@ from django.db import models
 #         return self.word
 
 
-class Coordinate(models.Model):
-    xValue = models.IntegerField()
-    yValue = models.IntegerField()
-
-
 class Word(models.Model):
     word = models.CharField(max_length=255)
-    coordinate = models.ForeignKey(Coordinate, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    coordinates = models.JSONField(default=list)
+    imageID = models.ForeignKey('Image', on_delete=models.CASCADE, default=None, blank=True, null=True)
 
 
 class SpeakerControl(models.Model):
-    coordinate = models.ForeignKey(Coordinate, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    coordinates = models.JSONField(default=list)
 
 
 class TranslationControl(models.Model):
-    coordinate = models.ForeignKey(Coordinate, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    coordinates = models.JSONField(default=list)
 
 
 class Sentence(models.Model):
     sentence = models.CharField(max_length=255)
-    word = models.ForeignKey(Word, on_delete=models.CASCADE)
-    speakerControl = models.ForeignKey(SpeakerControl, on_delete=models.CASCADE, default=None, blank=True, null=True)
-    translationControl = models.ForeignKey(TranslationControl, on_delete=models.CASCADE, default=None, blank=True, null=True)
-
+    imageID = models.ForeignKey('Image', on_delete=models.CASCADE, default=None, blank=True, null=True)
+    speakerControlID = models.ForeignKey('SpeakerControl', on_delete=models.CASCADE, default=None, blank=True, null=True)
+    translationControlID = models.ForeignKey('TranslationControl', on_delete=models.CASCADE, default=None, blank=True, null=True)
 
 class Image(models.Model):
-    id = models.CharField(max_length=255, primary_key=True)
+    name = models.CharField(max_length=255, default=None, blank=True, null=True)
     location = models.CharField(max_length=255, default=None, blank=True, null=True)
-    word = models.ForeignKey(Word, on_delete=models.CASCADE, default=None, blank=True, null=True)
-    sentence = models.ForeignKey(Sentence, on_delete=models.CASCADE, default=None, blank=True, null=True)
+    imageSetID = models.ForeignKey('ImageSet', on_delete=models.CASCADE, default=None, blank=True, null=True)
 
+    def __str__(self):
+        return self.name
 
 class ImageSet(models.Model):   # delete this later
-    image = models.ForeignKey(Image, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, default=None, blank=True, null=True)
     # words = models.ManyToManyField(Word)
 
-    # def __str__(self):
-    #     return self.imageName
+    def __str__(self):
+        return self.name
 
 
 # class ImageSet(models.Model):
