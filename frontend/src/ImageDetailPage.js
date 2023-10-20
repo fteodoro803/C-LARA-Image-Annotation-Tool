@@ -6,6 +6,7 @@ function ImageDetailPage({ images, enteredWords }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [editedWords, setEditedWords] = useState([...enteredWords]);
   const [isEditingMode, setIsEditingMode] = useState(false);
+  const [selectedWord, setSelectedWord] = useState(null);
   const navigate = useNavigate();
 
   const handleImageClick = (index) => {
@@ -14,7 +15,13 @@ function ImageDetailPage({ images, enteredWords }) {
   };
 
   const handleEditButtonClick = () => {
-    setIsEditingMode(!isEditingMode);
+    setIsEditingMode(true);
+    setSelectedWord(null); //deselect previously selected word
+  };
+
+  const handleWordClick = (word) => {
+    setSelectedWord(word);
+    setIsEditingMode(false); // exit editing mode if it's active
   };
 
   const handleWordEditDone = (e, index) => {
@@ -27,10 +34,14 @@ function ImageDetailPage({ images, enteredWords }) {
   };
 
   const handleMapButtonClick = () => {
+    if (!selectedWord) {
+      alert('Please select a word first.');
+      return;
+    }
     navigate('/maptool', {
       state: { 
         selectedImage: selectedImage,
-        enteredWords: editedWords 
+        enteredWords: [selectedWord]  // send only the selected word.
       }
     });
   }
@@ -39,11 +50,11 @@ function ImageDetailPage({ images, enteredWords }) {
     <div className="image-detail-container">
       <div className="image-list">
         {images.map((url, index) => (
-          <div key={index} className="image-box" onClick={() => handleImageClick(index)}>
-            <img src={url} alt={`Uploaded ${index}`} />
-          </div>
-        ))}
-      </div>
+          <div key={index} className={`image-box ${selectedImage === images[index] ? 'selected' : ''}`} onClick={() => handleImageClick(index)}>
+          <img src={url} alt={`Uploaded ${index}`} />
+        </div>
+      ))}
+    </div>
 
       {selectedImage && (
         <div className="selected-image-container">
@@ -51,7 +62,7 @@ function ImageDetailPage({ images, enteredWords }) {
 
           <div className="controls-container">
             <button className="edit-button" onClick={handleEditButtonClick}>Edit Words</button>
-
+            
             {isEditingMode ? (
               editedWords.map((word, index) => (
                 <input
@@ -68,7 +79,10 @@ function ImageDetailPage({ images, enteredWords }) {
               ))
             ) : (
               editedWords.map((word, index) => (
-                <button key={index} onClick={() => setIsEditingMode(true)}>
+                <button key={index} 
+                        onClick={() => handleWordClick(word)}
+                        style = {{backgroundColor: word === selectedWord ? 'lightgray' : ''}}
+                >
                   {word}
                 </button>
               ))
