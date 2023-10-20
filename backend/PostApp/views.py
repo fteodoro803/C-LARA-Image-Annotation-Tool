@@ -18,18 +18,27 @@ class UploadImageView(APIView):
         image = request.FILES.get('image')
         name = request.data.get('name')
 
-        if image and name:
+        # Check if the uploaded file is an image
+        if image and self.is_image(image):
             upload = Image.objects.create(name=name, file=image)
             upload.save()
             return Response({
                 "message": "Uploaded successfully!",
                 "imageName": upload.name,
-                "imageLocation": upload.file.url  # Return URL
+                "imageLocation": upload.file.url
             }, status=status.HTTP_201_CREATED)
         else:
             return Response({
-                "message": "Invalid request. Name and image are required.",
+                "message": "Invalid request. A valid image and name are required.",
             }, status=status.HTTP_400_BAD_REQUEST)
+
+    def is_image(self, file):
+        # Check if the file has a valid image MIME type
+        valid_image_types = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/tiff", "image/svg+xml"]
+        content_type = file.content_type
+        if content_type in valid_image_types:
+            return True
+        return False
 
 
 class ListImagesView(ListAPIView):
