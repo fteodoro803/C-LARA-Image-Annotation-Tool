@@ -5,8 +5,10 @@
 inspired by photo editing software, such as: Draw, Erase and Detect.
 
 ## Dependencies
+
 #### Frontend:
 - [React 18.2](https://react.dev/learn/installation)
+  
 #### Backend: 
 - [Python 3.10](https://www.python.org/downloads/)
 - [Django 4.2.4](https://www.djangoproject.com/download/)
@@ -15,6 +17,7 @@ inspired by photo editing software, such as: Draw, Erase and Detect.
 - Django CORS Headers 4.2.0 (pip install django-cors-headers)
 
 ## Running the Program
+
 #### Frontend:
 
 #### Backend: 
