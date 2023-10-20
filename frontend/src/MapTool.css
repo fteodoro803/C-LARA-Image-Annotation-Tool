@@ -63,3 +63,35 @@
     background-color: #80cbc4; /* Teal button color */
     color: white; /* Text color */
 }
+
+/* Button default style */
+.top-buttons button {
+    margin: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.top-buttons button.color-button {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border-radius: 50%; /* makes it circular */
+    margin-left: 2px;
+    margin-right: 2px;
+    text-align: center;
+    line-height: 25px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.top-buttons button.color-button:hover {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.top-buttons button.color-button.white {
+    border: 1px solid #aaa; /* making white color button more visible */
+}
