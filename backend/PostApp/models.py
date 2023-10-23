@@ -9,6 +9,8 @@ class Word(models.Model):
     # Our implementation associates words with images, but can be associated with sentences for future extension:
     # sentenceID = models.ForeignKey('Sentence', on_delete=models.CASCADE, default=None, blank=True, null=True)
 
+    def __str__(self):
+        return self.word
 
 # Not used in our implementation - here for future C-LARA extension
 class SpeakerControl(models.Model):
