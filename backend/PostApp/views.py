@@ -9,6 +9,7 @@ from .serializers import ImageSerializer, WordSerializer
 import os
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.views import View
 
 # Create your views here.
 class UploadImageView(APIView):
@@ -158,3 +159,26 @@ class FetchCoordinatesView(APIView):
             return Response({
                 "message": "Word not found."
             }, status=status.HTTP_404_NOT_FOUND)
+
+class JSONOutputView(View):
+    def get(self, request, *args, **kwargs):
+        images = Image.objects.all()
+        output = []
+
+        for image in images:
+            segments = []
+
+            words = Word.objects.filter(imageID=image)  # Get all associated Word objects
+
+            for word in words:
+                segments.append({
+                    "item": word.word,
+                    "coordinates": word.coordinates,
+                })
+
+            output.append({
+                "image_id": image.name,
+                "segments": segments,
+            })
+
+        return JsonResponse(output, safe=False, json_dumps_params={'indent': 4})  # Adding indent to prettify the JSON

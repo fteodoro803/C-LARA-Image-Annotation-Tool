@@ -1,6 +1,6 @@
 # urls.py
 from django.urls import path
-from .views import UploadImageView, ListImagesView, DeleteImageView, AddWordView, DeleteWordView, ListWordsView, EditWordView, AddCoordinateView, FetchCoordinatesView
+from .views import UploadImageView, ListImagesView, DeleteImageView, AddWordView, DeleteWordView, ListWordsView, EditWordView, AddCoordinateView, FetchCoordinatesView, JSONOutputView
 
 urlpatterns = [
     #Images
@@ -17,4 +17,7 @@ urlpatterns = [
     # Coordinates
     path('add_coordinates/', AddCoordinateView.as_view(), name='add_coordinates'),
     path('coordinates/<int:word_id>/', FetchCoordinatesView.as_view(), name='fetch_coordinates'),
+
+    # JSON
+    path('json_output/', JSONOutputView.as_view(), name='json_output'),  # Define a new URL pattern for the JSON output
 ]
