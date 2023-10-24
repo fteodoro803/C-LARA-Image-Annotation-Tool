@@ -2,6 +2,22 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './MapTool.css';
 
+//access components of imageDetailPage after navigating from MapToolPage
+const ImageContext = createContext();
+
+export const ImageProvider = ({ children }) => {
+    const [images, setImages] = useState([]);
+    const [words, setWords] = useState([]);
+
+    return (
+        <ImageContext.Provider value={{ images, setImages, words, setWords }}>
+            {children}
+        </ImageContext.Provider>
+    );
+};
+
+export const useImageStore = () => useContext(ImageContext);
+
 function MapToolPage({ onBackClick }) {
     const location = useLocation();
     const selectedImage = location.state?.selectedImage;
