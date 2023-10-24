@@ -305,22 +305,25 @@ function MapToolPage({ onBackClick }) {
             </div>
 
             <div className="image-container">
-    <canvas 
-        ref={canvasRef} 
-        width={500}  
-        height={500} 
-        style={{ position: 'absolute', zIndex: 1 }}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={stopDrawing}
-    />
-    <canvas 
-        ref={imageCanvasRef} 
-        width={500}
-        height={500}
-        style={{ position: 'relative', zIndex: 0 }}
-    />
-</div>
+
+                <canvas
+                    ref={canvasRef}
+                    width={500}
+                    height={500}
+                    style={{ position: 'absolute', zIndex: 1 }}
+                    onMouseDown={startDrawing}
+                    onMouseMove={draw}
+                    onMouseUp={stopDrawing}
+                />
+
+                <canvas
+                    ref={imageCanvasRef}
+                    width={500}
+                    height={500}
+                    style={{ position: 'relative', zIndex: 0 }}
+                />
+
+            </div>
 
             <div className="word-choice">
                 <p>Selected word: {enteredWords.word}</p>
