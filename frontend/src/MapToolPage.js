@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { createContext, useContext} from 'react';
 import './MapTool.css';
 
 //access components of imageDetailPage after navigating from MapToolPage
