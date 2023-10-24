@@ -140,6 +140,11 @@ function ImageDetailPage({ enteredWords }) {
     });
   };
 
+  const handleBackButtonClick = () => {
+
+    navigate('/');
+  };
+
 
   return (
       <div className="image-detail-container">
@@ -150,13 +155,14 @@ function ImageDetailPage({ enteredWords }) {
               </div>
           ))}
         </div>
+        <button className="back-button" onClick={handleBackButtonClick}>Back To Upload Page</button>
 
         {selectedImage && (
             <div className="selected-image-container">
               <img height={'400px'} width={'auto'} src={selectedImage.file} alt="Selected" />
 
               <div className="controls-container">
-                <button onClick={handleWordAdd}>Add Word</button>
+                <button className="word-add-button" onClick={handleWordAdd}>Add Word</button>
                 {isEditingMode ? (
                     editedWords.map((word, index) => (
                         <input
@@ -174,9 +180,10 @@ function ImageDetailPage({ enteredWords }) {
                 ) : (
                     <>
                       {words.map(word => (
-                          <div key={word.id}>
+                          <div key={word.id} className = "word-text">
                             {word.word}
                             <button
+                                className="word-edit-button"
                                 onClick={() => {
                                   const newWord = prompt("Edit word:", word.word);
                                   if (newWord) {
@@ -186,12 +193,12 @@ function ImageDetailPage({ enteredWords }) {
                             >
                               Edit
                             </button>
-                            <button onClick={() => handleMapButtonClickForWord(word.word)}>Map</button>
-                            <button onClick={() => handleWordDelete(word.id)}>Delete</button>
+                            <button className="word-delete-button" onClick={() => handleWordDelete(word.id)}>Delete</button>
+                            <button className="word-map-button" onClick={() => handleMapButtonClickForWord(word.word)}>Map</button>
                           </div>
                       ))}
-                      <button className="edit-button" onClick={handleEditButtonClick}>Edit Words</button>
-                      <button className="map-button" onClick={handleMapButtonClick}>Map Tool</button>
+                      {/*<button className="edit-button" onClick={handleEditButtonClick}>Edit Words</button>*/}
+                      {/*<button className="map-button" onClick={handleMapButtonClick}>Map Tool</button>*/}
                     </>
                 )}
               </div>
