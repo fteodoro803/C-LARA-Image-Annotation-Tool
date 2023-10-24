@@ -147,7 +147,9 @@ function ImageDetailPage({ enteredWords }) {
 
 
   return (
+
       <div className="image-detail-container">
+        <button className="back-button" onClick={handleBackButtonClick}>Back To Upload Page</button>
         <div className="image-list">
           {images.map((imageObj, index) => (
               <div key={imageObj.id} className={`image-box ${selectedImage === imageObj ? 'selected' : ''}`} onClick={() => handleImageClick(index)}>
@@ -155,7 +157,6 @@ function ImageDetailPage({ enteredWords }) {
               </div>
           ))}
         </div>
-        <button className="back-button" onClick={handleBackButtonClick}>Back To Upload Page</button>
 
         {selectedImage && (
             <div className="selected-image-container">
@@ -180,7 +181,7 @@ function ImageDetailPage({ enteredWords }) {
                 ) : (
                     <>
                       {words.map(word => (
-                          <div key={word.id} className = "word-text">
+                          <div key={word.id}>
                             {word.word}
                             <button
                                 className="word-edit-button"
@@ -199,12 +200,15 @@ function ImageDetailPage({ enteredWords }) {
                       ))}
                       {/*<button className="edit-button" onClick={handleEditButtonClick}>Edit Words</button>*/}
                       {/*<button className="map-button" onClick={handleMapButtonClick}>Map Tool</button>*/}
+
                     </>
                 )}
               </div>
             </div>
         )}
+
       </div>
+
   );
 
 
