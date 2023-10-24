@@ -1,6 +1,7 @@
 from django.test import TestCase
 from ..models import Word, Image
 
+
 class WordModelTest(TestCase):
 
     @classmethod
