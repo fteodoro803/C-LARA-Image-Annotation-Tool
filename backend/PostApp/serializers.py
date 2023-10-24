@@ -1,8 +1,13 @@
+# serializers.py
 from rest_framework import serializers
-from .models import Post
+from .models import Image, Word
 
-# Converts between Python Data and API JSON
-class PostSerializer(serializers.ModelSerializer):
+class ImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Post
-        fields = '__all__'
+        model = Image
+        fields = ('id', 'name', 'file')
+
+class WordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Word
+        fields = ('id', 'word', 'coordinates', 'imageID')
