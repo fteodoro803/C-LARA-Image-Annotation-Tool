@@ -31,11 +31,11 @@ function MapToolPage({ onBackClick }) {
     const [coordinates, setCoordinates] = useState('');
     const [displayCoordinates, setDisplayCoordinates] = useState('');
 
-
-
     const navigate = useNavigate();
 
-    const handleSave = () => {
+    const handleLassoTool = () => {}
+
+    const handleSave = async () => {
         // Implement save logic here
         try {
             let parsedCoordinates = null;
@@ -66,12 +66,6 @@ function MapToolPage({ onBackClick }) {
         }
     }
 
-    const handleDone = () => {
-        // Implement done logic here
-    }
-
-    
-
     const canvasRef = useRef(null);
     const imageCanvasRef = useRef(null);
 
@@ -82,6 +76,7 @@ function MapToolPage({ onBackClick }) {
     const [showPaletteDropdown, setShowPaletteDropdown] = useState(false);
     const colors = ['black', 'red', 'white','teal'];
     const dropdownRef = useRef(null);
+
 
    useEffect(() => {
         function handleClickOutside(event) {
@@ -96,14 +91,17 @@ function MapToolPage({ onBackClick }) {
         };
     }, []);
 
+
     useEffect(() => {
         const context = imageCanvasRef.current.getContext('2d');
         drawImageToCanvas(context);
     }, [selectedImage]);
 
+
     useEffect(() => {
         redrawCanvas(actionStack, canvasRef.current.getContext('2d'));
     }, [actionStack]);
+
 
     const drawImageToCanvas = (context) => {
         const image = new Image();
@@ -111,11 +109,7 @@ function MapToolPage({ onBackClick }) {
         image.onload = () => {
             context.drawImage(image, 0, 0, context.canvas.width, context.canvas.height);
         }
-
     }
-
-    
-    
 
     const startDrawing = (e) => {
         setIsDrawing(true);
@@ -185,6 +179,7 @@ function MapToolPage({ onBackClick }) {
         setLines([]);
     };
 
+
     const redrawCanvas = (actions, canvasContext) => {
         canvasContext.clearRect(0,0,canvasContext.canvas.width, canvasContext.canvas.height);
         
@@ -207,7 +202,6 @@ function MapToolPage({ onBackClick }) {
             canvasContext.closePath();
 
         });
-        
 
     };
 
@@ -239,9 +233,6 @@ function MapToolPage({ onBackClick }) {
         lastActionTimeRef.current = currentTime;
         return false;
     };
-
-
-    
 
 
     const handleUndo = () => {
@@ -288,9 +279,6 @@ function MapToolPage({ onBackClick }) {
         }
     };
 
-    
-    
-    
 
     return (
         <div className="map-tool-container">
@@ -300,6 +288,9 @@ function MapToolPage({ onBackClick }) {
                 {/*<button onClick={handleDone}>Done</button>*/}
                 <button onClick={handleUndo}>⟲</button>
                 <button onClick={handleRedo}>⟳</button>
+
+                <button onClick={handleLassoTool}>⏢</button>
+
                 <button onClick={() => setTool('pencil')}>✏️</button>
                 {colors.map(color => (
                   <button 
@@ -320,7 +311,7 @@ function MapToolPage({ onBackClick }) {
         width={500}  
         height={500} 
         style={{ position: 'absolute', zIndex: 1 }}
-        onMouseDown={startDrawing} 
+        onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
     />

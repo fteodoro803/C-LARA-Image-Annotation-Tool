@@ -41,6 +41,10 @@
     font-weight: bold; /* Bold text for "Choose words:" */
 }
 
+.word-text p {
+    font-weight: normal; /* Bold text for "Choose words:" */
+}
+
 .word-choice button {
     background-color: #80cbc4; /* Teal button color */
     color: white; /* Text color */
