@@ -78,6 +78,7 @@
   margin-top: 20px;
 }
 
+
 .word-box {
   background-color: lightgray;
   border: 1px solid gray;
@@ -87,13 +88,25 @@
 
 
 .image-detail-container {
+  flex: 1;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction : column;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
 }
 
-.image-list {
+.image-list, .word-text {
   display: flex;
+  justify-content: center;
+
+  max-width: fit-content;
   flex-wrap: wrap;
   gap: 20px;
+  border: 1px solid gray;
+
 }
 
 .image-list-item {
@@ -115,12 +128,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 .selected-image {
   max-width: 100%;
   display: block;
   margin: 20px 0;
+  border: 1px solid gray;
+
 }
 
 .button-container {
@@ -142,6 +161,39 @@
   font-size: 16px; /* Font size adjustment */
 }
 
+.word-add-button, .word-map-button {
+  margin-top: 10px;
+  padding: 10px 20px; /* Add padding for better aesthetics */
+  border: none; /* Removes the default border */
+  background-color: #2196F3; /* Example blue color */
+  color: white; /* Text color */
+  cursor: pointer; /* Hand cursor on hover */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 16px; /* Font size adjustment */
+}
+
+.back-button {
+  margin-top: 10px;
+  max-width: fit-content;
+  padding: 10px 20px; /* Add padding for better aesthetics */
+  border: none; /* Removes the default border */
+  background-color: #2196F3; /* Example blue color */
+  color: white; /* Text color */
+  cursor: pointer; /* Hand cursor on hover */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 16px; /* Font size adjustment */
+}
+
+.word-edit-button, .word-delete-button {
+  margin-top: 10px;
+  padding: 10px 20px; /* Add padding for better aesthetics */
+  border: none; /* Removes the default border */
+  background-color: #969696; /* Example blue color */
+  color: white; /* Text color */
+  cursor: pointer; /* Hand cursor on hover */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 16px; /* Font size adjustment */
+}
 
 .map-button {
   background-color: #007bff;
@@ -151,11 +203,13 @@
   width: 100px; /* Adjust as needed */
   height: 100px; /* Adjust as needed */
   overflow: hidden;
+
 }
 
 .image-box img {
   width: 100%;
   height: auto;
+
 }
 
 
