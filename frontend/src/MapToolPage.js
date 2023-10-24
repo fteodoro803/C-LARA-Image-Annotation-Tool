@@ -35,11 +35,6 @@ function MapToolPage({ onBackClick }) {
         // Implement save logic here
     }
 
-    const handleDone = () => {
-        // Implement done logic here
-    }
-
-    
 
     const canvasRef = useRef(null);
     const imageCanvasRef = useRef(null);
@@ -82,10 +77,59 @@ function MapToolPage({ onBackClick }) {
         }
 
     }
-
     
+    // to save imageState for undo redo operations
+    const saveCanvasState = (canvas) => {
+        const context = canvas.getContext('2d');
+        return context.getImageData(0, 0, canvas.width, canvas.height);
+      }
+      
+      const loadCanvasState = (canvas, imageData) => {
+        const context = canvas.getContext('2d');
+        context.putImageData(imageData, 0, 0);
+      }
+      
+      
+      const handleUndo = () => {
+        if (actionStack.length === 0) return;
     
+        const lastAction = actionStack[actionStack.length - 1];
+        setRedoStack(prev => [...prev, lastAction]);
+        
+        setActionStack(prev => {
+            const newStack = [...prev];
+            newStack.pop();
+            return newStack;
+        });
+    
+        redrawCanvas(actionStack, canvasRef.current.getContext('2d'));
+      };
+    
+      
+      //intialise redo stack
+      const [redoStack, setRedoStack] = useState([]);
 
+      const handleRedo = () => {
+        if (redoStack.length === 0) return;
+    
+        const actionToRedo = redoStack[redoStack.length - 1];
+        setActionStack(prev => [...prev, actionToRedo]);
+        
+        setRedoStack(prev => {
+            const newStack = [...prev];
+            newStack.pop();
+            return newStack;
+        });
+    
+        redrawCanvas(actionStack, canvasRef.current.getContext('2d'));
+    };
+
+      
+      
+    
+      
+    
+    //sets tool and sets tool characteristics
     const startDrawing = (e) => {
         setIsDrawing(true);
         const context = canvasRef.current.getContext('2d');
@@ -126,40 +170,95 @@ function MapToolPage({ onBackClick }) {
         context.lineTo(x, y);
         context.stroke();
     };
-    
 
-    const stopDrawing = () => {
-        setIsDrawing(false);
+    const drawSingleAction = (action, canvasContext) => {
+        canvasContext.beginPath();
+        canvasContext.strokeStyle = action.color;
+        canvasContext.lineWidth = action.width;
+        canvasContext.globalCompositeOperation = action.type === 'eraser' ? 'destination-out' : 'source-over';
+
+        const [firstPoint, ...restOfPoints] = action.path;
+        canvasContext.moveTo(firstPoint.x, firstPoint.y);
+
+        restOfPoints.forEach(point => {
+            canvasContext.lineTo(point.x, point.y);
+            canvasContext.stroke();
+        });
+
+        canvasContext.closePath();
+    };
+
+
+    const isLineClosed = (lines) => {
+        if (lines.length < 3) return false; // We assume at least 3 points to form a closed shape
     
-        // Check if the start and end points are close
         const startPoint = lines[0];
         const endPoint = lines[lines.length - 1];
         const distance = Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2));
     
-        if (distance > 10) {  // A threshold, you can adjust this value as needed
-            alert("Annotation not complete! Please connect boundary end points.");
-            return;  // Do not save the current annotation
-        }
-    
-        setActionStack(prev => [
-            ...prev,
-            {
-                type: tool,
-                path: lines,
-                color: tool === 'pencil' ? penColor : null,
-                width: tool === 'pencil' ? 2 :10
-            }
-        ]);
-        
-        setLines([]);
+        return distance < 5; // Threshold to determine if the start and end points are close enough to form a closed shape
     };
 
+    
+    
+
+    const stopDrawing = () => {
+        setIsDrawing(false);
+        const isCurrentLineClosed = isLineClosed(lines);
+    
+        if (!isCurrentLineClosed) {
+            alert("Annotation not closed. Please close the annotation by connecting the endpoints.");
+            return; // Return early to stop further execution if the annotation isn't closed
+        }
+    
+        const newAction = {
+            type: tool,
+            path: lines,
+            color: tool === 'pencil' ? penColor : null,
+            width: tool === 'pencil' ? 2 : 10,
+            isClosed: isCurrentLineClosed
+        };
+    
+        if (tool === 'eraser') {
+            setActionStack(prev => {
+                const newState = [...prev];
+    
+                for (let i = 0; i < newState.length; i++) {
+                    const action = newState[i];
+    
+                    if (action.type === 'pencil' && lines.some(line => 
+                        Math.abs(line.x - action.path[0].x) < 10 && 
+                        Math.abs(line.y - action.path[0].y) < 10
+                    )) {
+                        newState.splice(i, 1); // Remove this action as it's erased
+                        break;
+                    }
+                }
+    
+                return newState;
+            });
+        } else {
+            setActionStack(prev => [...prev, newAction]);
+        }
+    
+        // Now redraw the entire canvas based on actionStack
+        const canvasContext = canvasRef.current.getContext('2d');
+        redrawCanvas(actionStack, canvasContext); 
+    
+        const currentState = saveCanvasState(canvasRef.current);
+        setUndoStack(prev => [...prev, currentState]);
+        setRedoStack([]);
+    };
+    
+    
+    
+        
+
     const redrawCanvas = (actions, canvasContext) => {
-        canvasContext.clearRect(0,0,canvasContext.canvas.width, canvasContext.canvas.height);
+        // Clear only the annotation canvas, not the image canvas
+        canvasContext.clearRect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height);
         
-        drawImageToCanvas(canvasContext);
-        
-        actions.forEach (action=> {
+        actions.forEach(action => {
             canvasContext.beginPath();
             canvasContext.strokeStyle = action.color;
             canvasContext.lineWidth = action.width;
@@ -167,84 +266,54 @@ function MapToolPage({ onBackClick }) {
             
             const [firstPoint, ...restOfPoints] = action.path;
             canvasContext.moveTo(firstPoint.x, firstPoint.y);
-
+    
             restOfPoints.forEach(point => {
                 canvasContext.lineTo(point.x, point.y);
                 canvasContext.stroke();
             });
-
+    
             canvasContext.closePath();
-
         });
-        
-
     };
+    
 
-    const handleClearAll = () => {
-        const context = canvasRef.current.getContext('2d');
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        drawImageToCanvas(context);
-
-        if (actionStack.length > 0)
-        {
-            setUndoStack([...undoStack, ...actionStack]);
-        }
-        setActionStack([]);
+    
       
-    };
+    const handleClearAll = () => {
+        
+      };
+      
 
     const handleEraser = () => {
         setTool('eraser');
     }
 
-    const lastActionTimeRef = useRef(null);
+    
 
-    // Helper function to handle debouncing
-    const isDebounced = (delay = 300) => {
-        const currentTime = Date.now();
-        if (lastActionTimeRef.current && currentTime - lastActionTimeRef.current < delay) {
-            return true;
-        }
-        lastActionTimeRef.current = currentTime;
-        return false;
-    };
+
+    const handleDone = () => {
+    // Ensure there are completed annotations
+    if (actionStack.length > 0) {
+        // Get the most recent annotation
+        const recentAnnotation = actionStack[actionStack.length - 1];
+        
+        // Retrieve its coordinates
+        const recentCoordinates = recentAnnotation.path;
+        
+        // log coordinates can be passed to other functions(e.g., log them, save them, etc.)
+        console.log(recentCoordinates);
+    } else {
+        alert("No annotations have been made.");
+    }
+    
+    // Any other logic you want to implement for the "Done" action...
+}
 
 
     
 
 
-    const handleUndo = () => {
-        if (isDebounced()) return;  // Avoid rapid successive clicks
-
-        console.log("Before Undo:", actionStack, undoStack);
-        
-        if (actionStack.length === 0) return;
-
-        const newUndoAction = actionStack[actionStack.length - 1];
-        setUndoStack(prev => [...prev, newUndoAction]);
-
-        setActionStack(prev => {
-            const newActionStack = prev.slice(0, -1);
-            return newActionStack;
-        });
-
-        console.log("After Undo:", actionStack, undoStack);
-    };
-
-    const handleRedo = () => {
-        if (isDebounced()) return;  // Avoid rapid successive clicks
-
-        console.log("Before Redo:", actionStack, undoStack);
-        
-        if (undoStack.length === 0) return;
-
-        const redoAction = undoStack[undoStack.length - 1];
-        setUndoStack(prev => prev.slice(0, -1));
-
-        setActionStack(prev => [...prev, redoAction]);
-
-        console.log("After Redo:", actionStack, undoStack);
-    };
+    
     
     
     const handleBackClick = () => {
