@@ -224,21 +224,18 @@ function MainApp() {
           <Route path="/maptool" element={<MapToolPage selectedImage={files[selectedImageIndex] || ''} enteredWords={enteredWords} />} />
           <Route path="/" element={
             <div>
-              <ImageUploadSection handleImageChange={handleImageChange} />
+              {/*<ImageUploadSection handleImageChange={handleImageChange} />*/}
+              {/*Image Upload Section*/}
+              <h2>Upload Image:</h2>
+              <input type="file" onChange={handleFileChange} />
+              <button onClick={handleUpload}>Upload</button>
+
+              {/*Image Display Section*/}
               <ImageDisplaySection files={files} handleImageSelect={handleImageSelect} selectedImages={selectedImages} setSelectedImageIndex={setSelectedImageIndex} />
               <DeleteSelectedButton selectedImages={selectedImages} handleDeleteSelected={handleDeleteSelected} />
               {/*<TextEntrySection inputText={inputText} handleInputChange={handleInputChange} handleDoneClick={handleDoneClick} enteredWords={enteredWords} />*/}
               <button onClick={handleProceedClick}>Proceed</button>
-
-
-              <br /><br /><br /><br /><br /><br /><br /><hr />
-              <h2>ImageUploadTest</h2>
-              <input type="file" onChange={handleFileChange} />
-              <button onClick={handleUpload}>Upload</button>
-
-              <h2>Image Manager</h2>
-              <ImageDisplay />
-
+              
             </div>
           } />
         </Routes>

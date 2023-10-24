@@ -281,6 +281,7 @@ export function WordManager() {
                         >
                             Edit
                         </button>
+                        <button>Map Tool</button>    {/*Do Routing to Map Tool Here*/}
                         <button onClick={() => handleWordDelete(word.id)}>Delete</button>
                     </div>
                 ))}
