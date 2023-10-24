@@ -1,6 +1,7 @@
 import React, {useState, useRef, useEffect, createContext, useContext} from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './MapTool.css';
+import axios from "axios";
 
 //access components of imageDetailPage after navigating from MapToolPage
 const ImageContext = createContext();
@@ -27,11 +28,42 @@ function MapToolPage({ onBackClick }) {
     const [actionStack, setActionStack] = useState([]);
     const [undoStack, setUndoStack] = useState([]);
 
+    const [coordinates, setCoordinates] = useState('');
+    const [displayCoordinates, setDisplayCoordinates] = useState('');
+
+
 
     const navigate = useNavigate();
 
     const handleSave = () => {
         // Implement save logic here
+        try {
+            let parsedCoordinates = null;
+
+            if (coordinates) {
+                try {
+                    parsedCoordinates = JSON.parse(coordinates);
+                } catch (error) {
+                    console.error("Invalid JSON format:", error);
+                    alert("Please enter a valid JSON format for coordinates or leave it blank.");
+                    return;
+                }
+            }
+
+            const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
+                word_id: enteredWords.id,
+                coordinates: parsedCoordinates,
+            });
+
+            console.log("Coordinates updated successfully:", response.data);
+
+            // Update displayed coordinates
+            setDisplayCoordinates(coordinates);
+
+            setCoordinates(''); // Clearing the input field
+        } catch (error) {
+            console.error("Error updating coordinates:", error);
+        }
     }
 
     const handleDone = () => {

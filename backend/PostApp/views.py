@@ -175,6 +175,7 @@ class FetchCoordinatesView(APIView):
                 "message": "Word not found."
             }, status=status.HTTP_404_NOT_FOUND)
 
+
 class JSONOutputView(View):
     def get(self, request, *args, **kwargs):
         images = Image.objects.all()
