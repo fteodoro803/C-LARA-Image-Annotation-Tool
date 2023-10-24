@@ -22,7 +22,8 @@ inspired by photo editing software, such as: Draw, Erase and Detect.
 1. `cd frontend`
 2. `npm install`
 3. `npm install axios`
-4. `npm start`
+4. `npm install react-lasso-select`
+5. `npm start`
 
 #### Backend: 
 1. `cd backend`
