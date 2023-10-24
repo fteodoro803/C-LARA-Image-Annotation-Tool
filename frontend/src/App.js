@@ -95,7 +95,6 @@ function MainApp() {
   };
 
 
-
   const [images, setImages] = useState([]);
 
   useEffect(() => {
@@ -216,6 +215,11 @@ function MainApp() {
     setShowMapToolPage(false);
   }
 
+  function handleJSONButtonClick() {
+      // Redirecting the user to the specified URL
+      window.location.href = "http://localhost:8000/api/json_output/";
+  }
+
 
   return (
       <div className="App">
@@ -234,8 +238,12 @@ function MainApp() {
               <ImageDisplaySection files={files} handleImageSelect={handleImageSelect} selectedImages={selectedImages} setSelectedImageIndex={setSelectedImageIndex} />
               <DeleteSelectedButton selectedImages={selectedImages} handleDeleteSelected={handleDeleteSelected} />
               {/*<TextEntrySection inputText={inputText} handleInputChange={handleInputChange} handleDoneClick={handleDoneClick} enteredWords={enteredWords} />*/}
-              <button onClick={handleProceedClick}>Proceed</button>
-              
+              <button className="word-add-button" onClick={handleProceedClick}>Proceed</button>
+              <br></br>
+              <hr></hr>
+              <button className="word-edit-button" onClick={handleJSONButtonClick}>Generate JSON File</button>
+              {/*<JSONButton />*/}
+
             </div>
           } />
         </Routes>

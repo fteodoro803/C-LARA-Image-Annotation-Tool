@@ -127,7 +127,22 @@ function ImageDetailPage({ enteredWords }) {
   };
 
 
-  const handleMapButtonClickForWord = (word) => {
+  // const handleMapButtonClickForWord = (word) => {
+  //   console.log(selectedImage, word)
+  //   if (!word) {
+  //     alert('Please select a word first.');
+  //     return;
+  //   }
+  //   navigate('/map-tool', {
+  //     state: {
+  //       selectedImage: selectedImage,
+  //       enteredWords: [word] // send only the selected word.
+  //     }
+  //   });
+  // };
+
+  const handleMapButtonClickForWord = (selectedImage, word) => {
+    console.log(selectedImage, word)
     if (!word) {
       alert('Please select a word first.');
       return;
@@ -135,7 +150,7 @@ function ImageDetailPage({ enteredWords }) {
     navigate('/maptool', {
       state: {
         selectedImage: selectedImage,
-        enteredWords: [word] // send only the selected word.
+        enteredWords: word // send only the selected word.
       }
     });
   };
@@ -150,6 +165,7 @@ function ImageDetailPage({ enteredWords }) {
 
       <div className="image-detail-container">
         <button className="back-button" onClick={handleBackButtonClick}>Back To Upload Page</button>
+        <h2>Select Image:</h2>
         <div className="image-list">
           {images.map((imageObj, index) => (
               <div key={imageObj.id} className={`image-box ${selectedImage === imageObj ? 'selected' : ''}`} onClick={() => handleImageClick(index)}>
@@ -195,7 +211,7 @@ function ImageDetailPage({ enteredWords }) {
                               Edit
                             </button>
                             <button className="word-delete-button" onClick={() => handleWordDelete(word.id)}>Delete</button>
-                            <button className="word-map-button" onClick={() => handleMapButtonClickForWord(word.word)}>Map</button>
+                            <button className="word-map-button" onClick={() => handleMapButtonClickForWord(selectedImage, word)}>Map</button>
                           </div>
                       ))}
                       {/*<button className="edit-button" onClick={handleEditButtonClick}>Edit Words</button>*/}

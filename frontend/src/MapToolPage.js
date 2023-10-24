@@ -75,7 +75,7 @@ function MapToolPage({ onBackClick }) {
 
     const drawImageToCanvas = (context) => {
         const image = new Image();
-        image.src = selectedImage;
+        image.src = selectedImage.file;
         image.onload = () => {
             context.drawImage(image, 0, 0, context.canvas.width, context.canvas.height);
         }
@@ -265,7 +265,7 @@ function MapToolPage({ onBackClick }) {
             <div className="top-buttons">
                 <button onClick={handleSave}>Save</button>
                 <button onClick={handleBackClick}>Back</button>
-                <button onClick={handleDone}>Done</button>
+                {/*<button onClick={handleDone}>Done</button>*/}
                 <button onClick={handleUndo}>⟲</button>
                 <button onClick={handleRedo}>⟳</button>
                 <button onClick={() => setTool('pencil')}>✏️</button>
@@ -301,10 +301,12 @@ function MapToolPage({ onBackClick }) {
 </div>
 
             <div className="word-choice">
-                <p>Choose words:</p>
-                {enteredWords.map((word, index) => (
-                    <button key={index}>{word}</button>
-                ))}
+                <p>Selected word: {enteredWords.word}</p>
+
+                {/*<p>{enteredWords.word</p>*/}
+                {/*{enteredWords.map((word, index) => (*/}
+                {/*    <button key={index}>{word}</button>*/}
+                {/*))}*/}
             </div>
         </div>
     );

@@ -40,11 +40,16 @@
 
 
 .image-container {
+  flex: 1;
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  flex-direction : row;
   justify-content: center;
   gap: 10px;
   margin-top: 20px;
+
+
 }
 
 
