@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import './MapTool.css';
 import axios from "axios";
 
+import ReactLassoSelect, { getCanvas } from 'react-lasso-select';
+
 //access components of imageDetailPage after navigating from MapToolPage
 const ImageContext = createContext();
 
@@ -28,7 +30,7 @@ function MapToolPage({ onBackClick }) {
     const [actionStack, setActionStack] = useState([]);
     const [undoStack, setUndoStack] = useState([]);
 
-    const [coordinates, setCoordinates] = useState('');
+    const [points, setPoints] = useState([]);
     const [displayCoordinates, setDisplayCoordinates] = useState('');
 
     const navigate = useNavigate();
@@ -36,20 +38,15 @@ function MapToolPage({ onBackClick }) {
     const handleLassoTool = () => {}
 
     const handleSave = async () => {
+        const goalArrayJSON = convertArrayFormat(points); // Getting the JSON string
+        console.log(goalArrayJSON);
+
         // Implement save logic here
         try {
-            let parsedCoordinates = null;
+            // Parsing the JSON string back to an array
+            let parsedCoordinates = JSON.parse(goalArrayJSON);
 
-            if (coordinates) {
-                try {
-                    parsedCoordinates = JSON.parse(coordinates);
-                } catch (error) {
-                    console.error("Invalid JSON format:", error);
-                    alert("Please enter a valid JSON format for coordinates or leave it blank.");
-                    return;
-                }
-            }
-
+            // Sending the parsed array to the backend
             const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
                 word_id: enteredWords.id,
                 coordinates: parsedCoordinates,
@@ -58,9 +55,9 @@ function MapToolPage({ onBackClick }) {
             console.log("Coordinates updated successfully:", response.data);
 
             // Update displayed coordinates
-            setDisplayCoordinates(coordinates);
+            setDisplayCoordinates(goalArrayJSON);
 
-            setCoordinates(''); // Clearing the input field
+            // setPoints([]); // Clearing the points array
         } catch (error) {
             console.error("Error updating coordinates:", error);
         }
@@ -280,6 +277,18 @@ function MapToolPage({ onBackClick }) {
     };
 
 
+    // Lasso Tool
+    const src = selectedImage.file;
+    // const [points, setPoints] = useState([]);
+    const [clippedImg, setClippedImg] = useState();
+    const [width, setWidth] = useState(1000);    // make a way to scale the coordinates
+
+    function convertArrayFormat(sourceArray) {
+        const goalArray = sourceArray.map(item => [item.x, item.y]);
+        return JSON.stringify(goalArray)
+    }
+
+
     return (
         <div className="map-tool-container">
             <div className="top-buttons">
@@ -330,6 +339,24 @@ function MapToolPage({ onBackClick }) {
                 {/*{enteredWords.map((word, index) => (*/}
                 {/*    <button key={index}>{word}</button>*/}
                 {/*))}*/}
+            </div>
+
+            <ReactLassoSelect
+                value={points}
+                src={src}
+                onChange={value => {
+                    setPoints(value);
+                }}
+                imageStyle={{ width: `${width}px` }}
+                onComplete={value => {
+                    if (!value.length) return;
+                    getCanvas(src, value, (err, canvas) => {
+                        console.log(points)
+                    });
+                }}
+            />
+            <div>
+                Points: {points.map(({x, y}) => `${x},${y}`).join(' ')}
             </div>
         </div>
     );
