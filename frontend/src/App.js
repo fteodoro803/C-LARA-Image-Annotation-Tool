@@ -206,6 +206,16 @@ function MainApp() {
     // You may also want to update associated data like enteredWords accordingly.
   };
 
+  function handleSaveClick() {
+  setEnteredWords(editedWords);
+  setShowMapToolPage(false);
+  }
+
+  function handleBackClick() {
+    setEditedWords([...enteredWords]);
+    setShowMapToolPage(false);
+  }
+
 
   return (
       <div className="App">
@@ -217,7 +227,7 @@ function MainApp() {
               <ImageUploadSection handleImageChange={handleImageChange} />
               <ImageDisplaySection files={files} handleImageSelect={handleImageSelect} selectedImages={selectedImages} setSelectedImageIndex={setSelectedImageIndex} />
               <DeleteSelectedButton selectedImages={selectedImages} handleDeleteSelected={handleDeleteSelected} />
-              <TextEntrySection inputText={inputText} handleInputChange={handleInputChange} handleDoneClick={handleDoneClick} enteredWords={enteredWords} />
+              {/*<TextEntrySection inputText={inputText} handleInputChange={handleInputChange} handleDoneClick={handleDoneClick} enteredWords={enteredWords} />*/}
               <button onClick={handleProceedClick}>Proceed</button>
 
 
