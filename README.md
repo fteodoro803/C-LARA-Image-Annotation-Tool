@@ -8,6 +8,8 @@ inspired by photo editing software, such as: Draw, Erase and Detect.
 
 #### Frontend:
 - [React 18.2](https://react.dev/learn/installation)
+- [Axios](https://www.npmjs.com/package/axios)
+- [React-lasso-select 1.2.2](https://www.npmjs.com/package/react-lasso-select)
   
 #### Backend: 
 - [Python 3.10](https://www.python.org/downloads/)
@@ -38,8 +40,6 @@ inspired by photo editing software, such as: Draw, Erase and Detect.
 
 ## Acknowledgements
 - [Language and Reading Assistant (LARA)](https://www.unige.ch/callector/lara)
-- [Uploading images to Django REST API backend in React JS](https://medium.com/@cole_ruche/uploading-images-to-rest-api-backend-in-react-js-b931376b5833)
+- [React Lasso Select](https://www.npmjs.com/package/react-lasso-select)
 - [Segment Anything](https://github.com/facebookresearch/segment-anything)
 
-## Reminders
-- Reset db in settings.py
