@@ -81,6 +81,27 @@ function ImageDetailPage({ enteredWords }) {
     }
   }, [selectedImage]);
 
+  // const handleWordAdd = async () => {
+  //   const newWordValue = prompt("Enter a new word:");
+  //
+  //   if (newWordValue) {
+  //     try {
+  //       const response = await axios.post(`http://localhost:8000/api/add_word/`, {
+  //         word: newWordValue,
+  //         image_id: selectedImage.id
+  //       });
+  //
+  //       // Assuming the backend returns the added word, you can append it to the editedWords list.
+  //       const newWordData = response.data.word; // Adjust this path as per your API response structure
+  //       setEditedWords(prevWords => [...prevWords, newWordData]);
+  //       setWords(prevWords => [...prevWords, newWordData]);
+  //
+  //     } catch (error) {
+  //       console.error("Error adding word:", error);
+  //     }
+  //   }
+  // };
+
   const handleWordAdd = async () => {
     const newWordValue = prompt("Enter a new word:");
 
@@ -91,11 +112,24 @@ function ImageDetailPage({ enteredWords }) {
           image_id: selectedImage.id
         });
 
-        // Assuming the backend returns the added word, you can append it to the editedWords list.
-        const newWordData = response.data.word; // Adjust this path as per your API response structure
-        setEditedWords(prevWords => [...prevWords, newWordData]);
+        // Check if the status code indicates success (you can adjust this depending on your API)
+        if (response.status >= 200 && response.status < 300) {
+          if (response.data && response.data.word) {
+            const newWordData = response.data.word;
+            setEditedWords(prevWords => [...prevWords, newWordData]);
+            setWords(prevWords => [...prevWords, newWordData]);
+          } else {
+            console.error("Unexpected response structure:", response.data);
+            alert('Word added but there was an issue displaying it.');
+          }
+        } else {
+          console.error("Error adding word. Status code:", response.status);
+          alert('There was an issue adding the word. Please try again.');
+        }
+
       } catch (error) {
         console.error("Error adding word:", error);
+        alert('There was an error while adding the word. Please check console for more details.');
       }
     }
   };

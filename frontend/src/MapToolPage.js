@@ -35,7 +35,9 @@ function MapToolPage({ onBackClick }) {
 
     const navigate = useNavigate();
 
-    const handleLassoTool = () => {}
+    const handleLassoTool = () => {
+
+    }
 
     const handleSave = async () => {
         const goalArrayJSON = convertArrayFormat(points); // Getting the JSON string
@@ -277,18 +279,6 @@ function MapToolPage({ onBackClick }) {
     };
 
 
-    // Lasso Tool
-    const src = selectedImage.file;
-    // const [points, setPoints] = useState([]);
-    const [clippedImg, setClippedImg] = useState();
-    const [width, setWidth] = useState(1000);    // make a way to scale the coordinates
-
-    function convertArrayFormat(sourceArray) {
-        const goalArray = sourceArray.map(item => [item.x, item.y]);
-        return JSON.stringify(goalArray)
-    }
-
-
     return (
         <div className="map-tool-container">
             <div className="top-buttons">
@@ -312,8 +302,8 @@ function MapToolPage({ onBackClick }) {
                 ))}
                 <button onClick={handleEraser}>🧽</button>
                 <button onClick={handleClearAll}>🗑️ Clear All</button>
-
             </div>
+
             <div className="image-container">
     <canvas 
         ref={canvasRef} 
@@ -334,30 +324,10 @@ function MapToolPage({ onBackClick }) {
 
             <div className="word-choice">
                 <p>Selected word: {enteredWords.word}</p>
-
-                {/*<p>{enteredWords.word</p>*/}
-                {/*{enteredWords.map((word, index) => (*/}
-                {/*    <button key={index}>{word}</button>*/}
-                {/*))}*/}
             </div>
 
-            <ReactLassoSelect
-                value={points}
-                src={src}
-                onChange={value => {
-                    setPoints(value);
-                }}
-                imageStyle={{ width: `${width}px` }}
-                onComplete={value => {
-                    if (!value.length) return;
-                    getCanvas(src, value, (err, canvas) => {
-                        console.log(points)
-                    });
-                }}
-            />
-            <div>
-                Points: {points.map(({x, y}) => `${x},${y}`).join(' ')}
-            </div>
+
+
         </div>
     );
 }

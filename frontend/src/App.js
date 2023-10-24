@@ -2,7 +2,9 @@ import React, {useEffect, useState} from "react";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import ImageDetailPage from "./ImageDetailPage";
-import MapToolPage from "./MapToolPage";
+// import MapToolPage from "./MapToolPage";
+import MapToolPage from "./MapToolPageWithLasso";
+
 import {
   ImageUploader, ImageDisplay, WordManager, CoordinateManager
 } from "./newTools";
@@ -89,6 +91,10 @@ function MainApp() {
     try {
       const response = await axios.post('http://localhost:8000/api/upload/', formData);
       console.log("Uploaded successfully:", response.data);
+
+      const imagesResponse = await axios.get('http://localhost:8000/api/images/');
+      setImages(imagesResponse.data);
+
     } catch (error) {
       console.error("Error uploading image:", error);
     }
