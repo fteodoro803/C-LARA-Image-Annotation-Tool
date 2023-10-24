@@ -1,12 +1,14 @@
 # urls.py
 from django.urls import path
-from .views import UploadImageView, ListImagesView, DeleteImageView, AddWordView, DeleteWordView, ListWordsView, EditWordView, AddCoordinateView, FetchCoordinatesView, JSONOutputView
+from .views import (UploadImageView, ListImagesView, DeleteImageView, AddWordView, DeleteWordView, ListWordsView,
+                    EditWordView, AddCoordinateView, FetchCoordinatesView, JSONOutputView, GetImageView)
 
 urlpatterns = [
     #Images
     path('upload/', UploadImageView.as_view(), name='upload'),
     path('images/', ListImagesView.as_view(), name='list_images'),
     path('delete/<int:pk>/', DeleteImageView.as_view(), name='delete_image'),
+    path('get_image/<int:image_id>/', GetImageView.as_view(), name='get_image'),
 
     # Words
     path('words/<int:image_id>/', ListWordsView.as_view(), name='list_words'),  # List of Words for an Image

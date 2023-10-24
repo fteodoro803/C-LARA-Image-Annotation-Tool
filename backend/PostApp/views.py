@@ -10,6 +10,7 @@ import os
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views import View
+from django.http import FileResponse
 
 # Create your views here.
 class UploadImageView(APIView):
@@ -46,6 +47,20 @@ class ListImagesView(ListAPIView):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
 
+
+class GetImageView(APIView):
+    def get(self, request, image_id, format=None):
+        # Getting the image or returning a 404 if not found
+        image_obj = get_object_or_404(Image, pk=image_id)
+
+        # Check if the image file exists
+        if image_obj.file and image_obj.file.storage.exists(image_obj.file.name):
+            # Returning the image as a response
+            response = FileResponse(image_obj.file)
+            return response
+        else:
+            # Sending a response if the image doesn't exist
+            return Response({"message": "Image not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class DeleteImageView(DestroyAPIView):
     queryset = Image.objects.all()
