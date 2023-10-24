@@ -66,9 +66,98 @@ function MainApp() {
   const [selectedImages, setSelectedImages] = useState([]); // Maintain a list of selected image indexes
   const navigate = useNavigate();
 
+  // Image Upload Constants and Functions
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imageName, setImageName] = useState("");
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+
+    // Check if a file is selected
+    if (file) {
+      // Extract the filename without the extension and set it as the imageName
+      const fileNameWithoutExtension = file.name.replace(/\.[^/.]+$/, "");
+      setImageName(fileNameWithoutExtension);
+    }
+  };
+
+  const handleUpload = async () => {
+    const formData = new FormData();
+    formData.append('image', selectedFile);
+    formData.append('name', imageName);
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/upload/', formData);
+      console.log("Uploaded successfully:", response.data);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
+  };
+
+
+
+  const [images, setImages] = useState([]);
+
+  useEffect(() => {
+    // Fetch images from the backend
+    const fetchImages = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/images/');
+        setImages(response.data);
+      } catch (error) {
+        console.error("Error fetching images:", error);
+      }
+    };
+    fetchImages();
+  }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8000/api/delete/${id}`);
+      // Refetch images to update the list after deletion
+      const response = await axios.get('http://localhost:8000/api/images/');
+      setImages(response.data);
+      console.log("Image deleted successfully")
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    }
+  };
+
+
+  function ImageDisplaySection({ handleImageSelect, selectedImages, setSelectedImageIndex }) {
+    return (
+        <div className="image-container">
+          {images.map((image, index) => (
+              <div key={image.id} className="image-item">
+                {/*<input*/}
+                {/*    type="checkbox"*/}
+                {/*    checked={selectedImages.includes(index)}*/}
+                {/*    onChange={() => handleImageSelect(index)}*/}
+                {/*/>*/}
+                <img
+                    src={image.file} // Use server's image path
+                    alt={`Uploaded ${index}`}
+                    style={{
+                      maxWidth: "200px",
+                      maxHeight: "200px",
+                      width: "auto",
+                      height: "auto",
+                    }}
+                    onClick={() => setSelectedImageIndex(index)}
+                />
+                <button onClick={() => handleDelete(image.id)}>Delete</button>
+              </div>
+          ))}
+        </div>
+    );
+  }
+
+
+
   function handleProceedClick() {
     navigate("/imagedetail");  // navigate to the imagedetail route
   }
+
 
   function handleShowMapToolClick(index) {
     setSelectedImageIndex(index);
