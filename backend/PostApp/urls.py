@@ -13,7 +13,7 @@ urlpatterns = [
     # Words
     path('words/<int:image_id>/', ListWordsView.as_view(), name='list_words'),  # List of Words for an Image
     path('add_word/', AddWordView.as_view(), name='add_word'),
-    path('delete_word/<int:pk>/', DeleteWordView.as_view(), name='delete_word'),    # note, what is pk
+    path('delete_word/<int:pk>/', DeleteWordView.as_view(), name='delete_word'),
     path('edit_word/<int:word_id>/', EditWordView.as_view(), name='edit_word'),
 
     # Coordinates
