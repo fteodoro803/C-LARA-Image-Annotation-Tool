@@ -2,7 +2,14 @@
 
 ## Project Description
 - A program that simplifies the mapping experience of a Text Constructor for C-LARA image books by providing tools 
-inspired by photo editing software, such as: Draw, Erase and Detect.
+inspired by photo editing software, such as: Lasso Tool, Draw, Erase, Undo, Save.
+
+## Team Members
+- Fernando Teodoro (fteodoro@student.unimelb.edu.au)
+- Jahnavi Datla (jdatla@student.unimelb.edu.au)
+- Mahamithra Sivagnanam (msivagnanam@student.unimelb.edu.au)
+- Nicole Penrose (npenrose@student.unimelb.edu.au)
+- Ranumi Gihansa Wijeyesinghe (rwijeyesingh@student.unimelb.edu.au)
 
 ## Dependencies
 
@@ -18,7 +25,26 @@ inspired by photo editing software, such as: Draw, Erase and Detect.
 - Django Rest Framework 3.14.0 (pip install djangorestframework)
 - Django CORS Headers 4.2.0 (pip install django-cors-headers)
 
+## Installations
+
+#### Backend: 
+1. `cd backend`
+2. `python manage.py makemigrations`
+3. `python manage.py migrate`
+
+#### Frontend:
+1. `cd frontend`
+2. `npm install`
+3. `npm install axios`
+4. `npm install react-lasso-select`
+
 ## Running the Program
+First, run the backend in Terminal.
+Then, run the frontend in a separate Terminal.
+
+#### Backend: 
+1. `cd backend`
+2. `python manage.py runserver`
 
 #### Frontend:
 1. `cd frontend`
@@ -72,6 +98,7 @@ Testing is still in progress, but is being updated continually in the following 
 - [Language and Reading Assistant (LARA)](https://www.unige.ch/callector/lara)
 - [React Lasso Select](https://www.npmjs.com/package/react-lasso-select)
 - [Segment Anything](https://github.com/facebookresearch/segment-anything)
+- [ChatGPT-4](https://openai.com/gpt-4)
 
 ## License Considerations
 - [React Lasso Select - (ISC License)](https://github.com/akcyp/react-lasso-select/blob/main/LICENSE.md)
