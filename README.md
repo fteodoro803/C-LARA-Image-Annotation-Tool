@@ -22,24 +22,63 @@ inspired by photo editing software, such as: Draw, Erase and Detect.
 
 #### Frontend:
 1. `cd frontend`
-2. `npm install`
-3. `npm install axios`
-4. `npm install react-lasso-select`
-5. `npm start`
+2. `npm start`
 
-#### Backend: 
-1. `cd backend`
-2. `python manage.py runserver`
+## Documentation
+Relevant documentation is available in PDF format in /docs.
 
-## Team Members
-- Fernando Teodoro
-- Jahnavi Datla
-- Mahamithra Sivagnanam
-- Nicole Penrose
-- Ranumi Gihansa Wijeyesinghe
+#### Artefacts
+- Handover Report: Details about integration into C-LARA and potential extensions. Includes details of the current workflow of our tool and relevant features.
+- Product Requirements: User stories and requirements
+- Architectural Design: Diagrams and design models
+
+## Changelog
+
+#### Sprint 1
+- Created Upload webpage with "Upload Image" and "Add Word" functionality [main]
+- Created ImageDetail webpage with "Select Image" and "Edit word" functionality [main]
+- Created local server for backend [backend-dev]
+
+#### Sprint 2
+- Created basic Mapping Tool webpage interface [frontend-dev]
+- Created Database with Post and Word classes [backend-dev]
+- Created functions for linking backend and frontend  [frontend-backend-tools]
+
+#### Sprint 3
+- Implemented functionality for Pen tool and Erase tool [frontend-dev]
+- Implemented functionality for Undo and Redo buttons [frontend-dev]
+- Modified Database to be more Modular [backend-dev]
+- Fixed CSS issues [frontend-dev]
+- Pen tool and Erase tool bugfixes [frontend-dev]
+- Undo and Redo button bugfixes [frontend-dev]
+- Created Testing functionality for backend, and frontend-backend communication [backend-testing]
+- Fixed functions for linking backend and frontend  [frontend-backend-tools]
+- Linked frontend and backend [frontend-backend-merge]
+- Implemented Lasso tool functionality [frontend-backend-merge]
+- All changes merged to release branch [sprint-3-release] 
+
+## Testing
+Backend testing was conducted in [database-testing]
+- Test Cases in `backend/PostApp/tests` directory:
+  - testModels.py
+  - testViews.py
+
+Testing is still in progress, but is being updated continually in the following Confluence documents:
+- [Traceability Matrices](https://team029.atlassian.net/l/cp/as2ChHS7)
+- [Back-End Testing Process](https://team029.atlassian.net/l/cp/yhE0L0Sw)
+- [Bugs](https://team029.atlassian.net/wiki/spaces/SD/pages/10223620/Reported+Bugs?atlOrigin=eyJpIjoiOTdiYjBlOWVhYWIxNDQ5Mzg1MTQ2Y2Q2MGQxMDYyMDIiLCJwIjoiYyJ9)
 
 ## Acknowledgements
 - [Language and Reading Assistant (LARA)](https://www.unige.ch/callector/lara)
 - [React Lasso Select](https://www.npmjs.com/package/react-lasso-select)
 - [Segment Anything](https://github.com/facebookresearch/segment-anything)
 
+## License Considerations
+- [React Lasso Select - (ISC License)](https://github.com/akcyp/react-lasso-select/blob/main/LICENSE.md)
+  - [x] Commercial Use
+  - [x] Distribution
+  - [x] Modification
+  - [x] Private Use
+  - [ ] Liability
+  - [ ] Warranty
+  
