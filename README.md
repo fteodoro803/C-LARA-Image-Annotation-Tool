@@ -91,6 +91,7 @@ Backend testing was conducted in [database-testing]
 
 Testing is still in progress, but is being updated continually in the following Confluence documents:
 - [Traceability Matrices](https://team029.atlassian.net/l/cp/as2ChHS7)
+- [Front-End Testing Strategy](https://team029.atlassian.net/l/cp/kHBpHiFr)
 - [Back-End Testing Process](https://team029.atlassian.net/l/cp/yhE0L0Sw)
 - [Bugs](https://team029.atlassian.net/wiki/spaces/SD/pages/10223620/Reported+Bugs?atlOrigin=eyJpIjoiOTdiYjBlOWVhYWIxNDQ5Mzg1MTQ2Y2Q2MGQxMDYyMDIiLCJwIjoiYyJ9)
 
