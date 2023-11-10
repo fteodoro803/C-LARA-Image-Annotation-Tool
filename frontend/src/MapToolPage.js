@@ -1,9 +1,7 @@
-import React, {useState, useRef, useEffect, createContext, useContext} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { createContext, useContext} from 'react';
 import './MapTool.css';
-import axios from "axios";
-
-import ReactLassoSelect, { getCanvas } from 'react-lasso-select';
 
 //access components of imageDetailPage after navigating from MapToolPage
 const ImageContext = createContext();
@@ -30,40 +28,13 @@ function MapToolPage({ onBackClick }) {
     const [actionStack, setActionStack] = useState([]);
     const [undoStack, setUndoStack] = useState([]);
 
-    const [points, setPoints] = useState([]);
-    const [displayCoordinates, setDisplayCoordinates] = useState('');
 
     const navigate = useNavigate();
 
-    const handleLassoTool = () => {
-
-    }
-
-    const handleSave = async () => {
-        const goalArrayJSON = convertArrayFormat(points); // Getting the JSON string
-        console.log(goalArrayJSON);
-
+    const handleSave = () => {
         // Implement save logic here
-        try {
-            // Parsing the JSON string back to an array
-            let parsedCoordinates = JSON.parse(goalArrayJSON);
-
-            // Sending the parsed array to the backend
-            const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
-                word_id: enteredWords.id,
-                coordinates: parsedCoordinates,
-            });
-
-            console.log("Coordinates updated successfully:", response.data);
-
-            // Update displayed coordinates
-            setDisplayCoordinates(goalArrayJSON);
-
-            // setPoints([]); // Clearing the points array
-        } catch (error) {
-            console.error("Error updating coordinates:", error);
-        }
     }
+
 
     const canvasRef = useRef(null);
     const imageCanvasRef = useRef(null);
@@ -75,7 +46,6 @@ function MapToolPage({ onBackClick }) {
     const [showPaletteDropdown, setShowPaletteDropdown] = useState(false);
     const colors = ['black', 'red', 'white','teal'];
     const dropdownRef = useRef(null);
-
 
    useEffect(() => {
         function handleClickOutside(event) {
@@ -90,41 +60,108 @@ function MapToolPage({ onBackClick }) {
         };
     }, []);
 
-
     useEffect(() => {
         const context = imageCanvasRef.current.getContext('2d');
         drawImageToCanvas(context);
     }, [selectedImage]);
 
-
     useEffect(() => {
         redrawCanvas(actionStack, canvasRef.current.getContext('2d'));
     }, [actionStack]);
 
-
     const drawImageToCanvas = (context) => {
         const image = new Image();
-        image.src = selectedImage.file;
+        image.src = selectedImage;
         image.onload = () => {
             context.drawImage(image, 0, 0, context.canvas.width, context.canvas.height);
         }
-    }
 
-    const startDrawing = (e) => {
-        setIsDrawing(true);
-        const context = canvasRef.current.getContext('2d');
+    }
     
-        if (tool === 'pencil') {
-            context.globalCompositeOperation = 'source-over';
-            context.strokeStyle = penColor;
-            context.lineWidth = 2;
-        } else if (tool === 'eraser') {
-            context.globalCompositeOperation = 'destination-out';
-            context.lineWidth = 10;
+    // to save imageState for undo redo operations
+    const saveCanvasState = (canvas) => {
+        const context = canvas.getContext('2d');
+        return context.getImageData(0, 0, canvas.width, canvas.height);
+      }
+      
+      const loadCanvasState = (canvas, imageData) => {
+        const context = canvas.getContext('2d');
+        context.putImageData(imageData, 0, 0);
+      }
+      
+      
+      const handleUndo = () => {
+        if (actionStack.length === 0) return;
+    
+        const lastAction = actionStack[actionStack.length - 1];
+        setRedoStack(prev => [...prev, lastAction]);
+        
+        setActionStack(prev => {
+            const newStack = [...prev];
+            newStack.pop();
+            return newStack;
+        });
+    
+        redrawCanvas(actionStack, canvasRef.current.getContext('2d'));
+      };
+    
+      
+      //intialise redo stack
+      const [redoStack, setRedoStack] = useState([]);
+
+      const handleRedo = () => {
+        if (redoStack.length === 0) return;
+    
+        const actionToRedo = redoStack[redoStack.length - 1];
+        setActionStack(prev => [...prev, actionToRedo]);
+        
+        setRedoStack(prev => {
+            const newStack = [...prev];
+            newStack.pop();
+            return newStack;
+        });
+    
+        redrawCanvas(actionStack, canvasRef.current.getContext('2d'));
+    };
+
+      
+      
+    
+    const [activeAnnotationIndex, setActiveAnnotationIndex] = useState(null);
+
+    const NEAR_THRESHOLD = 3; // Number of pixels considered 'near' for extending
+
+    const findNearbyAnnotation = (x, y) => {
+        for (let i = actionStack.length - 1; i >= 0; i--) {
+            const lastPoint = actionStack[i].path[actionStack[i].path.length - 1];
+            const distance = Math.sqrt(Math.pow(lastPoint.x - x, 2) + Math.pow(lastPoint.y - y, 2));
+    
+            if (distance < NEAR_THRESHOLD) {
+                return i;
+            }
         }
     
-        context.beginPath();  // Start a new path for the drawing or erasing
-        setLines([{ x: e.clientX - canvasRef.current.offsetLeft, y: e.clientY - canvasRef.current.offsetTop }]);
+        return null;
+    };
+ 
+    
+    //sets tool and sets tool characteristics
+    const startDrawing = (e) => {
+        setIsDrawing(true);
+    
+        // Determine if starting near an existing annotation
+        const x = e.clientX - canvasRef.current.offsetLeft;
+        const y = e.clientY - canvasRef.current.offsetTop;
+        const nearbyAnnotationIndex = findNearbyAnnotation(x, y);
+    
+        // If near an annotation, set it as the active annotation
+        if (nearbyAnnotationIndex !== null) {
+            setActiveAnnotationIndex(nearbyAnnotationIndex);
+            setLines(actionStack[nearbyAnnotationIndex].path);
+        } else {
+            setActiveAnnotationIndex(null);
+            setLines([{ x, y }]);
+        }
     };
 
     const draw = (e) => {
@@ -150,41 +187,78 @@ function MapToolPage({ onBackClick }) {
         context.lineTo(x, y);
         context.stroke();
     };
-    
 
-    const stopDrawing = () => {
-        setIsDrawing(false);
-    
-        // Check if the start and end points are close
-        const startPoint = lines[0];
-        const endPoint = lines[lines.length - 1];
-        const distance = Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2));
-    
-        if (distance > 10) {  // A threshold, you can adjust this value as needed
-            alert("Annotation not complete! Please connect boundary end points.");
-            return;  // Do not save the current annotation
-        }
-    
-        setActionStack(prev => [
-            ...prev,
-            {
-                type: tool,
-                path: lines,
-                color: tool === 'pencil' ? penColor : null,
-                width: tool === 'pencil' ? 2 :10
-            }
-        ]);
-        
-        setLines([]);
+    const drawSingleAction = (action, canvasContext) => {
+        canvasContext.beginPath();
+        canvasContext.strokeStyle = action.color;
+        canvasContext.lineWidth = action.width;
+        canvasContext.globalCompositeOperation = action.type === 'eraser' ? 'destination-out' : 'source-over';
+
+        const [firstPoint, ...restOfPoints] = action.path;
+        canvasContext.moveTo(firstPoint.x, firstPoint.y);
+
+        restOfPoints.forEach(point => {
+            canvasContext.lineTo(point.x, point.y);
+            canvasContext.stroke();
+        });
+
+        canvasContext.closePath();
     };
 
 
+    //const isLineClosed = (lines) => {
+        //if (lines.length < 3) return false; // We assume at least 3 points to form a closed shape
+    
+        //const startPoint = lines[0];
+        //const endPoint = lines[lines.length - 1];
+        //const distance = Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2));
+    
+        //return distance < 5; // Threshold to determine if the start and end points are close enough to form a closed shape
+    //};
+
+    
+    const [erasedAnnotations, setErasedAnnotations] = useState([]);
+
+
+    const stopDrawing = () => {
+    setIsDrawing(false);
+
+    if (tool === 'eraser') {
+        for (let i = actionStack.length - 1; i >= 0; i--) {
+            const action = actionStack[i];
+            for (let linePoint of lines) {
+                for (let actionPoint of action.path) {
+                    if (Math.abs(linePoint.x - actionPoint.x) < 10 && Math.abs(linePoint.y - actionPoint.y) < 10) {
+                        setErasedAnnotations(prev => [...prev, action]);
+                    }
+                }
+            }
+        }
+    }
+
+    const newAction = {
+        type: tool,
+        path: lines,
+        color: tool === 'pencil' ? penColor : null,
+        width: tool === 'pencil' ? 2 : 10,
+    };
+     
+    setActionStack(prev => [...prev, newAction]);
+    
+    const currentState = saveCanvasState(canvasRef.current);
+    setUndoStack(prev => [...prev, currentState]);
+    setRedoStack([]);
+   
+    };
+
+    
+    
+
     const redrawCanvas = (actions, canvasContext) => {
-        canvasContext.clearRect(0,0,canvasContext.canvas.width, canvasContext.canvas.height);
+        // Clear only the annotation canvas, not the image canvas
+        canvasContext.clearRect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height);
         
-        drawImageToCanvas(canvasContext);
-        
-        actions.forEach (action=> {
+        actions.forEach(action => {
             canvasContext.beginPath();
             canvasContext.strokeStyle = action.color;
             canvasContext.lineWidth = action.width;
@@ -192,80 +266,44 @@ function MapToolPage({ onBackClick }) {
             
             const [firstPoint, ...restOfPoints] = action.path;
             canvasContext.moveTo(firstPoint.x, firstPoint.y);
-
+    
             restOfPoints.forEach(point => {
                 canvasContext.lineTo(point.x, point.y);
                 canvasContext.stroke();
             });
-
+    
             canvasContext.closePath();
-
         });
-
     };
+    
 
-    const handleClearAll = () => {
-        const context = canvasRef.current.getContext('2d');
-        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-        drawImageToCanvas(context);
-
-        if (actionStack.length > 0)
-        {
-            setUndoStack([...undoStack, ...actionStack]);
-        }
-        setActionStack([]);
+    
       
-    };
+    const handleClearAll = () => {
+        
+      };
+      
 
     const handleEraser = () => {
         setTool('eraser');
     }
 
-    const lastActionTimeRef = useRef(null);
 
-    // Helper function to handle debouncing
-    const isDebounced = (delay = 300) => {
-        const currentTime = Date.now();
-        if (lastActionTimeRef.current && currentTime - lastActionTimeRef.current < delay) {
-            return true;
+    
+    const handleDone = () => {
+        const nonErasedAnnotations = actionStack.filter(
+            action => !erasedAnnotations.includes(action)
+        );
+    
+        if (nonErasedAnnotations.length > 0) {
+            const recentAnnotation = nonErasedAnnotations[nonErasedAnnotations.length - 1];
+            const recentCoordinates = recentAnnotation.path;
+            console.log(recentCoordinates);
+        } else {
+            alert("No annotations have been made.");
         }
-        lastActionTimeRef.current = currentTime;
-        return false;
     };
-
-
-    const handleUndo = () => {
-        if (isDebounced()) return;  // Avoid rapid successive clicks
-
-        console.log("Before Undo:", actionStack, undoStack);
-        
-        if (actionStack.length === 0) return;
-
-        const newUndoAction = actionStack[actionStack.length - 1];
-        setUndoStack(prev => [...prev, newUndoAction]);
-
-        setActionStack(prev => {
-            const newActionStack = prev.slice(0, -1);
-            return newActionStack;
-        });
-
-        console.log("After Undo:", actionStack, undoStack);
-    };
-
-    const handleRedo = () => {
-        if (isDebounced()) return;  // Avoid rapid successive clicks
-
-        console.log("Before Redo:", actionStack, undoStack);
-        
-        if (undoStack.length === 0) return;
-
-        const redoAction = undoStack[undoStack.length - 1];
-        setUndoStack(prev => prev.slice(0, -1));
-
-        setActionStack(prev => [...prev, redoAction]);
-
-        console.log("After Redo:", actionStack, undoStack);
-    };
+    
     
     
     const handleBackClick = () => {
@@ -278,18 +316,18 @@ function MapToolPage({ onBackClick }) {
         }
     };
 
+    
+    
+    
 
     return (
         <div className="map-tool-container">
             <div className="top-buttons">
                 <button onClick={handleSave}>Save</button>
                 <button onClick={handleBackClick}>Back</button>
-                {/*<button onClick={handleDone}>Done</button>*/}
+                <button onClick={handleDone}>Done</button>
                 <button onClick={handleUndo}>⟲</button>
                 <button onClick={handleRedo}>⟳</button>
-
-                <button onClick={handleLassoTool}>⏢</button>
-
                 <button onClick={() => setTool('pencil')}>✏️</button>
                 {colors.map(color => (
                   <button 
@@ -302,37 +340,38 @@ function MapToolPage({ onBackClick }) {
                 ))}
                 <button onClick={handleEraser}>🧽</button>
                 <button onClick={handleClearAll}>🗑️ Clear All</button>
-            </div>
 
+            </div>
             <div className="image-container">
-
-                <canvas
-                    ref={canvasRef}
-                    width={500}
-                    height={500}
-                    style={{ position: 'absolute', zIndex: 1 }}
-                    onMouseDown={startDrawing}
-                    onMouseMove={draw}
-                    onMouseUp={stopDrawing}
-                />
-
-                <canvas
-                    ref={imageCanvasRef}
-                    width={500}
-                    height={500}
-                    style={{ position: 'relative', zIndex: 0 }}
-                />
-
-            </div>
+    <canvas 
+        ref={canvasRef} 
+        width={500}  
+        height={500} 
+        style={{ position: 'absolute', zIndex: 1 }}
+        onMouseDown={startDrawing} 
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+    />
+    <canvas 
+        ref={imageCanvasRef} 
+        width={500}
+        height={500}
+        style={{ position: 'relative', zIndex: 0 }}
+    />
+</div>
 
             <div className="word-choice">
-                <p>Selected word: {enteredWords.word}</p>
+                <p>Choose words:</p>
+                {enteredWords.map((word, index) => (
+                    <button key={index}>{word}</button>
+                ))}
             </div>
-
-
-
         </div>
     );
 }
 
 export default MapToolPage;
+
+
+
+  
