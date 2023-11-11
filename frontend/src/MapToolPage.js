@@ -391,7 +391,7 @@ function MapToolPage({ onBackClick }) {
                 <button onClick={handleEraser}>🧽</button>
                 <button onClick={handleClearAll}>🗑️ Clear All</button>
                 <button onClick={toggleDisplay}>
-                    {showLassoSelect ? "Show Canvases" : "Show Lasso Select"}
+                    {showLassoSelect ? "Disable Lasso Select" : "Enable Lasso Select"}
                 </button>
 
             </div>
