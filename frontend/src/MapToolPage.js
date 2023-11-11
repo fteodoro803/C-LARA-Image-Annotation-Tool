@@ -468,7 +468,13 @@ function MapToolPage({ onBackClick }) {
                             imageStyle={{ height: `${canvasHeight}px` }}
                             onComplete={value => {
                                 if (!value.length) return;
+
                                 getCanvas(src, value, (err, canvas) => {
+                                    // Preview of Selected Image
+                                    if (!err) {
+                                        setClippedImg(canvas.toDataURL());
+                                    }
+
                                     console.log(points)
                                 });
                             }}
@@ -476,6 +482,9 @@ function MapToolPage({ onBackClick }) {
                     </>
                 )}
             </div>
+
+            <p>Preview</p>
+            <img src={clippedImg} alt="clipped" />
 
             {/*<div className="word-choice">*/}
             {/*    <p>Choose words:</p>*/}
