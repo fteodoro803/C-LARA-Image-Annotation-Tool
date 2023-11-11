@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 import axios from 'axios'
+import Endpoint from "./Endpoints";
 
 
 function ImageDetailPage({ enteredWords }) {
@@ -14,11 +15,15 @@ function ImageDetailPage({ enteredWords }) {
   const [selectedWord, setSelectedWord] = useState(null);
   const navigate = useNavigate();
 
+  const [wordAddCount, setWordAddCount] = useState(0);  // Counter to Trigger Image-Word Loader when updated
+
   useEffect(() => {
     // Fetch images from the backend
     const fetchImages = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/images/');
+        // const response = await axios.get('http://localhost:8000/api/images/');
+        const response = await Endpoint.get('images/');
+
         setImages(response.data);
       } catch (error) {
         console.error("Error fetching images:", error);
@@ -67,11 +72,13 @@ function ImageDetailPage({ enteredWords }) {
   const [words, setWords] = useState([]); // Holds the words of the selected image
   const [newWord, setNewWord] = useState('');
 
+  // Gets Words of the Image
   useEffect(() => {
     if (selectedImage) {
       const fetchWords = async () => {
         try {
-          const response = await axios.get(`http://localhost:8000/api/words/${selectedImage.id}/`);
+          // const response = await axios.get(`http://localhost:8000/api/words/${selectedImage.id}/`);
+          const response = await Endpoint.get(`words/${selectedImage.id}/`);
           setWords(response.data);
         } catch (error) {
           console.error("Error fetching words:", error);
@@ -79,7 +86,7 @@ function ImageDetailPage({ enteredWords }) {
       };
       fetchWords();
     }
-  }, [selectedImage]);
+  }, [selectedImage, wordAddCount]);
 
   // const handleWordAdd = async () => {
   //   const newWordValue = prompt("Enter a new word:");
@@ -92,7 +99,7 @@ function ImageDetailPage({ enteredWords }) {
   //       });
   //
   //       // Assuming the backend returns the added word, you can append it to the editedWords list.
-  //       const newWordData = response.data.word; // Adjust this path as per your API response structure
+  //       const newWordData = response.data.word;
   //       setEditedWords(prevWords => [...prevWords, newWordData]);
   //       setWords(prevWords => [...prevWords, newWordData]);
   //
@@ -107,17 +114,19 @@ function ImageDetailPage({ enteredWords }) {
 
     if (newWordValue) {
       try {
-        const response = await axios.post(`http://localhost:8000/api/add_word/`, {
-          word: newWordValue,
-          image_id: selectedImage.id
+        // const response = await axios.post(`http://localhost:8000/api/add_word/`, {
+        const response = await Endpoint.post(`add_word/`, {
+            word: newWordValue,
+            image_id: selectedImage.id
         });
 
-        // Check if the status code indicates success (you can adjust this depending on your API)
+        // Check if the status code indicates success
         if (response.status >= 200 && response.status < 300) {
           if (response.data && response.data.word) {
             const newWordData = response.data.word;
             setEditedWords(prevWords => [...prevWords, newWordData]);
             setWords(prevWords => [...prevWords, newWordData]);
+            setWordAddCount(prevCount => prevCount + 1); // Increment the counter to trigger the useEffect hook (to reload the words)
           } else {
             console.error("Unexpected response structure:", response.data);
             alert('Word added but there was an issue displaying it.');
@@ -136,7 +145,8 @@ function ImageDetailPage({ enteredWords }) {
 
   const handleWordDelete = async (wordId) => {
     try {
-      await axios.delete(`http://localhost:8000/api/delete_word/${wordId}/`);
+      // await axios.delete(`http://localhost:8000/api/delete_word/${wordId}/`);
+      await Endpoint.delete(`delete_word/${wordId}/`);
       console.log("Word deleted successfully");
       setWords(prevWords => prevWords.filter(word => word.id !== wordId)); // Updating the word list
     } catch (error) {
@@ -146,8 +156,9 @@ function ImageDetailPage({ enteredWords }) {
 
   const handleWordEdit = async (wordId, newWord) => {
     try {
-      const response = await axios.put(`http://localhost:8000/api/edit_word/${wordId}/`, {
-        word: newWord,
+      // const response = await axios.put(`http://localhost:8000/api/edit_word/${wordId}/`, {
+      const response = await Endpoint.put(`edit_word/${wordId}/`, {
+          word: newWord,
       });
       console.log("Word edited successfully:", response.data);
       setWords(prevWords =>

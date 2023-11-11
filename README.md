@@ -11,6 +11,18 @@ inspired by photo editing software, such as: Lasso Tool, Draw, Erase, Undo, Save
 - Nicole Penrose (npenrose@student.unimelb.edu.au)
 - Ranumi Gihansa Wijeyesinghe (rwijeyesingh@student.unimelb.edu.au)
 
+## Features (Add GIFs here)
+- Draw Tool: Allows the user to draw on the image.
+- Lasso Tool: Allows the user to select a region of the image by drawing a closed loop around the region.
+  - Selection
+    - Click on the Image to start the Lasso Selection process
+    - Click around the Area you want to Surround, until you reach the starting point
+  - Edit
+    - Hold the Point (Box) you want to move
+    - Drag to desired location
+  - Restart
+    - Click on the Image outside of the Selected Area to restart the Process
+
 ## Dependencies
 
 #### Frontend:
@@ -85,7 +97,7 @@ Relevant documentation is available in PDF format in /docs.
 
 ## Testing
 Backend testing was conducted in [database-testing]
-- Test Cases in `backend/PostApp/tests` directory:
+- Test Cases in `backend/MapTool/tests` directory:
   - testModels.py
   - testViews.py
 

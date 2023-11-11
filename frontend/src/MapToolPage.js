@@ -4,6 +4,7 @@ import { createContext, useContext} from 'react';
 import './MapTool.css';
 import ReactLassoSelect, {getCanvas} from "react-lasso-select";
 import axios from "axios";
+import Endpoint from "./Endpoints";
 
 //access components of imageDetailPage after navigating from MapToolPage
 const ImageContext = createContext();
@@ -24,7 +25,7 @@ export const useImageStore = () => useContext(ImageContext);
 function MapToolPage({ onBackClick }) {
     const location = useLocation();
     const selectedImage = location.state?.selectedImage;
-    const enteredWords = location.state?.enteredWords;
+    const enteredWords = location.state?.enteredWords;  // note: should probably be renamed to selectedWord
     const [points, setPoints] = useState([]);
 
     const [canvasHeight, setCanvasHeight] = useState(500);    // make a way to scale the coordinates -- make sure uses same height as pen tool height
@@ -67,7 +68,8 @@ function MapToolPage({ onBackClick }) {
             let parsedCoordinates = JSON.parse(goalArrayJSON);
 
             // Sending the parsed array to the backend
-            const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
+            // const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
+            const response = await Endpoint.post('add_coordinates/', {
                 word_id: enteredWords.id,
                 coordinates: parsedCoordinates,
             });
@@ -454,9 +456,8 @@ function MapToolPage({ onBackClick }) {
 
     // Lasso Tool
     const src = selectedImage.file;
-    // const [points, setPoints] = useState([]);
-    const [clippedImg, setClippedImg] = useState();
-    const [height, setHeight] = useState(500);    // make a way to scale the coordinates -- make sure uses same height as pen tool height
+    const [previewImage, setPreviewImage] = useState();
+    const [previewHeight, setPreviewHeight] = useState(200);
 
     function convertArrayFormat(sourceArray) {
         const goalArray = sourceArray.map(item => [item.x, item.y]);
@@ -466,6 +467,34 @@ function MapToolPage({ onBackClick }) {
     const toggleDisplay = () => {
         setShowLassoSelect(!showLassoSelect);
     };
+
+    function convertCoordinatesToString(coordinates) {
+        return coordinates.map(pair => pair.join(',')).join(' ');
+    }
+
+    // Gets and Converts Coordinates from Backend to ReactLassoSelect Format
+    useEffect(() => {
+        async function fetchCoordinates() {
+            if (enteredWords && enteredWords.id) {
+                try {
+                    // const response = await axios.get(`http://localhost:8000/api/coordinates/${enteredWords.id}/`);
+                    const response = await Endpoint.get(`coordinates/${enteredWords.id}/`);
+                    const coordinates = response.data.coordinates;
+
+                    if (coordinates) {
+                        const coordPoints = coordinates
+                            .map(([x, y]) => ({ x, y }));
+                        setPoints(coordPoints);
+                        // console.log(coordPoints);
+                    }
+                } catch (error) {
+                    console.error("Error fetching coordinates:", error);
+                }
+            }
+        }
+
+        fetchCoordinates();
+    }, [enteredWords]);
 
 
     return (
@@ -527,14 +556,36 @@ function MapToolPage({ onBackClick }) {
                             imageStyle={{ height: `${canvasHeight}px` }}
                             onComplete={value => {
                                 if (!value.length) return;
+
                                 getCanvas(src, value, (err, canvas) => {
-                                    console.log(points)
+                                    // Preview of Selected Image
+                                    if (!err) {
+                                        setPreviewImage(canvas.toDataURL());
+                                    }
                                 });
                             }}
                         />
                     </>
                 )}
             </div>
+
+            <h3>Selected Word: {enteredWords.word}</h3>
+
+            { showLassoSelect && (
+                <>
+                    <h3>Preview</h3>
+                    <img src={previewImage} alt="Lasso Preview" height={previewHeight}/>
+                </>
+            )}
+
+            <h3>Selected Word: {enteredWords.word}</h3>
+
+            { showLassoSelect && (
+                <>
+                    <h3>Preview</h3>
+                    <img src={previewImage} alt="Lasso Preview" height={previewHeight}/>
+                </>
+            )}
 
             <div className="word-choice">
                 <p>Selected word: {enteredWords.word}</p>

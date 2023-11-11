@@ -4,6 +4,7 @@ import "./App.css";
 import ImageDetailPage from "./ImageDetailPage";
 import MapToolPage from "./MapToolPage";
 // import MapToolPage from "./MapToolPageWithLasso";
+import Endpoint from "./Endpoints";
 
 import {
   ImageUploader, ImageDisplay, WordManager, CoordinateManager
@@ -68,6 +69,9 @@ function MainApp() {
   const [selectedImages, setSelectedImages] = useState([]); // Maintain a list of selected image indexes
   const navigate = useNavigate();
 
+  // Images
+  const [images, setImages] = useState([]);
+
   // Image Upload Constants and Functions
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageName, setImageName] = useState("");
@@ -89,10 +93,13 @@ function MainApp() {
     formData.append('name', imageName);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/upload/', formData);
+      // const response = await axios.post('http://localhost:8000/api/upload/', formData);
+      const response = await Endpoint.post('upload/', formData);
       console.log("Uploaded successfully:", response.data);
 
-      const imagesResponse = await axios.get('http://localhost:8000/api/images/');
+      // const imagesResponse = await axios.get('http://localhost:8000/api/images/');
+      const imagesResponse = await Endpoint.get('images/');
+
       setImages(imagesResponse.data);
 
     } catch (error) {
@@ -101,13 +108,12 @@ function MainApp() {
   };
 
 
-  const [images, setImages] = useState([]);
-
   useEffect(() => {
     // Fetch images from the backend
     const fetchImages = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/images/');
+        // const response = await axios.get('http://localhost:8000/api/images/');
+        const response = await Endpoint.get('images/');
         setImages(response.data);
       } catch (error) {
         console.error("Error fetching images:", error);
@@ -118,9 +124,13 @@ function MainApp() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/delete/${id}`);
+      // await axios.delete(`http://localhost:8000/api/delete/${id}`);
+      await Endpoint.delete(`delete/${id}`);
+
       // Refetch images to update the list after deletion
-      const response = await axios.get('http://localhost:8000/api/images/');
+      // const response = await axios.get('http://localhost:8000/api/images/');
+      const response = await Endpoint.get('images/');
+
       setImages(response.data);
       console.log("Image deleted successfully")
     } catch (error) {
@@ -160,7 +170,13 @@ function MainApp() {
 
 
   function handleProceedClick() {
-    navigate("/imagedetail");  // navigate to the imagedetail route
+    if (images.length === 0) {
+      // Show a popup if there are no images
+      alert("There are no images. Please upload an image to proceed.");
+    } else {
+      // Proceed to the imagedetail route if there are images
+      navigate("/imagedetail");
+    }
   }
 
 
@@ -223,7 +239,8 @@ function MainApp() {
 
   function handleJSONButtonClick() {
       // Redirecting the user to the specified URL
-      window.location.href = "http://localhost:8000/api/json_output/";
+      // window.location.href = "http://localhost:8000/api/json_output/";
+      window.location.href = `${Endpoint.defaults.baseURL}json_output/`;
   }
 
 
