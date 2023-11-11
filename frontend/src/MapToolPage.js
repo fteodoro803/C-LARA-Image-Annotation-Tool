@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { createContext, useContext} from 'react';
 import './MapTool.css';
 import ReactLassoSelect, {getCanvas} from "react-lasso-select";
+import axios from "axios";
 
 //access components of imageDetailPage after navigating from MapToolPage
 const ImageContext = createContext();
@@ -41,6 +42,44 @@ function MapToolPage({ onBackClick }) {
 
     const handleSave = async () => {
         // Implement save logic here
+        // console.log(lines)
+        // console.log(points)
+
+        let goalArrayJSON;
+
+        // Lasso Tool Selected
+        if (showLassoSelect) {
+             goalArrayJSON = convertArrayFormat(points); // Getting the JSON string
+        }
+        // Pen Tool Selected
+        else {
+            goalArrayJSON = convertArrayFormat(lines); // Getting the JSON string
+
+        }
+
+        // const goalArrayJSON = convertArrayFormat(lines); // Getting the JSON string
+        console.log(goalArrayJSON);
+
+        // Implement save logic here
+        try {
+            // Parsing the JSON string back to an array
+            let parsedCoordinates = JSON.parse(goalArrayJSON);
+
+            // Sending the parsed array to the backend
+            const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
+                word_id: enteredWords.id,
+                coordinates: parsedCoordinates,
+            });
+
+            console.log("Coordinates updated successfully:", response.data);
+
+            // // Update displayed coordinates
+            // setDisplayCoordinates(goalArrayJSON);
+
+            // setPoints([]); // Clearing the points array
+        } catch (error) {
+            console.error("Error updating coordinates:", error);
+        }
     }
 
 
