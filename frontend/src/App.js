@@ -68,6 +68,9 @@ function MainApp() {
   const [selectedImages, setSelectedImages] = useState([]); // Maintain a list of selected image indexes
   const navigate = useNavigate();
 
+  // Images
+  const [images, setImages] = useState([]);
+
   // Image Upload Constants and Functions
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageName, setImageName] = useState("");
@@ -100,8 +103,6 @@ function MainApp() {
     }
   };
 
-
-  const [images, setImages] = useState([]);
 
   useEffect(() => {
     // Fetch images from the backend
@@ -160,7 +161,13 @@ function MainApp() {
 
 
   function handleProceedClick() {
-    navigate("/imagedetail");  // navigate to the imagedetail route
+    if (images.length === 0) {
+      // Show a popup if there are no images
+      alert("There are no images. Please upload an image to proceed.");
+    } else {
+      // Proceed to the imagedetail route if there are images
+      navigate("/imagedetail");
+    }
   }
 
 
