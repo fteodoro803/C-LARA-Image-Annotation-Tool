@@ -11,7 +11,9 @@ function AppRouter() {
       <Switch>
         <Route exact path="/" component={App} />
         <Route path="/image-detail" component={ImageDetailPage} />
-        <Route path="/map-tool" component={MapToolPageWithLasso} />
+          <Route path="/map-tool" component={MapToolPage} />
+
+          {/*<Route path="/map-tool" component={MapToolPageWithLasso} />*/}
       </Switch>
     </Router>
   );

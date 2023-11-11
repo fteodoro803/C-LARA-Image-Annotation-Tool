@@ -2,8 +2,8 @@ import React, {useEffect, useState} from "react";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
 import "./App.css";
 import ImageDetailPage from "./ImageDetailPage";
-// import MapToolPage from "./MapToolPage";
-import MapToolPage from "./MapToolPageWithLasso";
+import MapToolPage from "./MapToolPage";
+// import MapToolPage from "./MapToolPageWithLasso";
 
 import {
   ImageUploader, ImageDisplay, WordManager, CoordinateManager
