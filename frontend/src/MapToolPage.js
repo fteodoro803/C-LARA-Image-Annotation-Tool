@@ -36,6 +36,7 @@ function MapToolPage({ onBackClick }) {
 
     const [actionStack, setActionStack] = useState([]);
     const [undoStack, setUndoStack] = useState([]);
+    const [penStrokes, setPenStrokes] = useState([]);
 
 
     const navigate = useNavigate();
@@ -94,6 +95,7 @@ function MapToolPage({ onBackClick }) {
     const colors = ['black', 'red', 'white','teal'];
     const dropdownRef = useRef(null);
 
+
     useEffect(() => {
         function handleClickOutside(event) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -113,9 +115,11 @@ function MapToolPage({ onBackClick }) {
         drawImageToCanvas(context);
     }, [selectedImage, canvasWidth]);
 
+
     useEffect(() => {
-        redrawCanvas(actionStack, canvasRef.current.getContext('2d'));
-    }, [actionStack]);
+        redrawCanvas(penStrokes, canvasRef.current.getContext('2d'));
+        console.log("Current collection of penStrokes:", penStrokes);
+    }, [penStrokes]);
 
     const drawImageToCanvas = (context) => {
         const image = new Image();
@@ -139,11 +143,6 @@ function MapToolPage({ onBackClick }) {
         return context.getImageData(0, 0, canvasWidth, canvasHeight);
     }
 
-    const loadCanvasState = (canvas, imageData) => {
-        const context = canvas.getContext('2d');
-        context.putImageData(imageData, 0, 0);
-    }
-
 
     const handleUndo = () => {
         if (actionStack.length === 0) return;
@@ -157,7 +156,15 @@ function MapToolPage({ onBackClick }) {
             return newStack;
         });
 
-        redrawCanvas(actionStack, canvasRef.current.getContext('2d'));
+        for (let removedStroke of lastAction.removedStrokes) {
+            setPenStrokes(prev => [...prev, removedStroke]);
+        }
+
+        for (let addedStroke of lastAction.addedStrokes) {
+            setPenStrokes(penStrokes.filter(stroke => stroke !== addedStroke));
+        }
+
+        redrawCanvas(penStrokes, canvasRef.current.getContext('2d'));
     };
 
 
@@ -176,46 +183,81 @@ function MapToolPage({ onBackClick }) {
             return newStack;
         });
 
-        redrawCanvas(actionStack, canvasRef.current.getContext('2d'));
-    };
-
-
-
-
-    const [activeAnnotationIndex, setActiveAnnotationIndex] = useState(null);
-
-    const NEAR_THRESHOLD = 3; // Number of pixels considered 'near' for extending
-
-    const findNearbyAnnotation = (x, y) => {
-        for (let i = actionStack.length - 1; i >= 0; i--) {
-            const lastPoint = actionStack[i].path[actionStack[i].path.length - 1];
-            const distance = Math.sqrt(Math.pow(lastPoint.x - x, 2) + Math.pow(lastPoint.y - y, 2));
-
-            if (distance < NEAR_THRESHOLD) {
-                return i;
-            }
+        for (let removedStroke of actionToRedo.removedStrokes) {
+            setPenStrokes(penStrokes.filter(stroke => stroke !== removedStroke));
         }
 
-        return null;
+        for (let addedStroke of actionToRedo.addedStrokes) {
+            setPenStrokes(prev => [...prev, addedStroke]);
+        }
+
+        redrawCanvas(penStrokes, canvasRef.current.getContext('2d'));
     };
+
+
+    // const [activeAnnotationIndex, setActiveAnnotationIndex] = useState(null);
+
+    // const NEAR_THRESHOLD = 3; // Number of pixels considered 'near' for extending
+
+    // const findNearbyAnnotation = (x, y) => {
+    //     for (let i = actionStack.length - 1; i >= 0; i--) {
+    //         const lastPoint = actionStack[i].path[actionStack[i].path.length - 1];
+    //         const distance = Math.sqrt(Math.pow(lastPoint.x - x, 2) + Math.pow(lastPoint.y - y, 2));
+
+    //         if (distance < NEAR_THRESHOLD) {
+    //             return i;
+    //         }
+    //     }
+
+    //     return null;
+    // };
 
 
     //sets tool and sets tool characteristics
     const startDrawing = (e) => {
         setIsDrawing(true);
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        context.beginPath(); // Start a new path
 
         // Determine if starting near an existing annotation
         const x = e.clientX - canvasRef.current.offsetLeft;
         const y = e.clientY - canvasRef.current.offsetTop;
-        const nearbyAnnotationIndex = findNearbyAnnotation(x, y);
+        
+        context.moveTo(x, y); // Move the context path to the starting point without creating a line
+        setLines([{ x, y }]);
 
-        // If near an annotation, set it as the active annotation
-        if (nearbyAnnotationIndex !== null) {
-            setActiveAnnotationIndex(nearbyAnnotationIndex);
-            setLines(actionStack[nearbyAnnotationIndex].path);
-        } else {
-            setActiveAnnotationIndex(null);
-            setLines([{ x, y }]);
+    };
+
+    const orderPenStrokes = () => {
+        let orderedPenStrokes = [];
+        let minimumDistance = 10000;
+        let closestStroke = penStrokes[0];
+        for (let i = 0; i < penStrokes.length; i++) {
+            if (penStrokes[i] in orderedPenStrokes) {
+                continue;
+            }
+            for (let j = 1; j <= penStrokes.length; j++) {
+                if (penStrokes[j] in orderedPenStrokes) {
+                    continue;
+                }
+                let distances = [];
+                distances.push(Math.abs(penStrokes[i].endPoint.x - penStrokes[j].endPoint.x) +
+                    Math.abs(penStrokes[i].endPoint.y - penStrokes[j].endPoint.y));
+                distances.push(Math.abs(penStrokes[i].endPoint.x - penStrokes[j].endPoint.x) +
+                    Math.abs(penStrokes[i].startPoint.y - penStrokes[j].startPoint.y));
+                distances.push(Math.abs(penStrokes[i].startPoint.x - penStrokes[j].startPoint.x) +
+                    Math.abs(penStrokes[i].startPoint.y - penStrokes[j].startPoint.y));
+                distances.push(Math.abs(penStrokes[i].startPoint.x - penStrokes[j].startPoint.x) +
+                    Math.abs(penStrokes[i].endPoint.y - penStrokes[j].endPoint.y));
+                let closestPoint = Math.min(...distances);
+                if (closestPoint < minimumDistance) {
+                    minimumDistance = closestPoint;
+                    closestStroke = penStrokes[j];
+                }
+            }
+            orderedPenStrokes.push(penStrokes[i]);
+            orderedPenStrokes.push(closestStroke);
         }
     };
 
@@ -243,85 +285,115 @@ function MapToolPage({ onBackClick }) {
         context.stroke();
     };
 
-    const drawSingleAction = (action, canvasContext) => {
-        canvasContext.beginPath();
-        canvasContext.strokeStyle = action.color;
-        canvasContext.lineWidth = action.width;
-        canvasContext.globalCompositeOperation = action.type === 'eraser' ? 'destination-out' : 'source-over';
-
-        const [firstPoint, ...restOfPoints] = action.path;
-        canvasContext.moveTo(firstPoint.x, firstPoint.y);
-
-        restOfPoints.forEach(point => {
-            canvasContext.lineTo(point.x, point.y);
-            canvasContext.stroke();
-        });
-
-        canvasContext.closePath();
-    };
-
-
-    //const isLineClosed = (lines) => {
-    //if (lines.length < 3) return false; // We assume at least 3 points to form a closed shape
-
-    //const startPoint = lines[0];
-    //const endPoint = lines[lines.length - 1];
-    //const distance = Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2));
-
-    //return distance < 5; // Threshold to determine if the start and end points are close enough to form a closed shape
-    //};
-
-
-    const [erasedAnnotations, setErasedAnnotations] = useState([]);
-
 
     const stopDrawing = () => {
+
+        console.log("Stopped drawing");
+        
+        
         setIsDrawing(false);
 
-        if (tool === 'eraser') {
-            for (let i = actionStack.length - 1; i >= 0; i--) {
-                const action = actionStack[i];
-                for (let linePoint of lines) {
-                    for (let actionPoint of action.path) {
-                        if (Math.abs(linePoint.x - actionPoint.x) < 10 && Math.abs(linePoint.y - actionPoint.y) < 10) {
-                            setErasedAnnotations(prev => [...prev, action]);
+        const uniqueLines = [...new Set(lines)];
+
+        let newStrokes = [];
+        let removedStrokes = [];
+
+        console.log("lines: ", uniqueLines);
+
+        if (tool === 'pencil') {
+            const newStroke = {
+                path: uniqueLines,
+                startPoint: lines[0],
+                endPoint: lines[lines.length - 1],
+                color: penColor,
+                width: 2,
+            };
+            newStrokes.push(newStroke);
+        }
+
+
+        else if (tool === 'eraser' && penStrokes.length > 0) {
+
+            for (let stroke of penStrokes) {
+                const penStroke = stroke;
+                let oldStrokePath = [...new Set(stroke.path)];
+                let newStrokePath = [...new Set(stroke.path)];
+
+                for (let linePoint of uniqueLines) {
+                    for (let strokePoint of newStrokePath) {
+                        if (Math.abs(linePoint.x - strokePoint.x) < 10 && Math.abs(linePoint.y - strokePoint.y) < 10) {
+                            newStrokePath = newStrokePath.filter(point => point !== strokePoint);
+                            console.log("newStrokePath: ", newStrokePath);
+                        }
+                    }
+                }
+
+                newStrokePath = [...new Set(newStrokePath)];
+
+                if (newStrokePath.length < oldStrokePath.length) {
+                    removedStrokes.push(penStroke);
+
+                    let prevEndPoint = 1;
+                    for (let i = 1; i < newStrokePath.length; i++) {
+                        let currentPoint = newStrokePath[i];
+                        let previousPoint = newStrokePath[i-1];
+                        if (Math.abs(currentPoint.x - previousPoint.x) > 2 && Math.abs(currentPoint.y - previousPoint.y) > 2) {
+                            const newStroke = penStroke;
+                            let newPath = newStroke.path.splice(0, prevEndPoint);
+                            newPath = newPath.splice(i);
+                            newStroke.endPoint = newPath[0];
+                            newStroke.startPoint = newPath[newPath.length-1];
+                            newStrokes.push(newStroke);
+                            prevEndPoint = i;
                         }
                     }
                 }
             }
+
         }
 
-        const newAction = {
-            type: tool,
-            path: lines,
-            color: tool === 'pencil' ? penColor : null,
-            width: tool === 'pencil' ? 2 : 10,
-        };
 
-        setActionStack(prev => [...prev, newAction]);
+        setActionStack(prevActionStack => [
+            ...prevActionStack, 
+            { type: tool, addedStrokes: newStrokes, removedStrokes },
+        ]);
 
+
+        if (removedStrokes.length > 0) {
+                for (let removedStroke of removedStrokes) {
+                    setPenStrokes(penStrokes.filter(stroke => stroke !== removedStroke));
+                }
+            }
+
+        
+        for (let newStroke of newStrokes) {
+            setPenStrokes(prev => [...prev, newStroke]);
+        }
+
+        console.log(penStrokes);
+        
         const currentState = saveCanvasState(canvasRef.current);
+
         setUndoStack(prev => [...prev, currentState]);
         setRedoStack([]);
 
     };
 
 
+    const redrawCanvas = (penStrokes, canvasContext) => {
 
-
-    const redrawCanvas = (actions, canvasContext) => {
-        // Clear only the annotation canvas, not the image canvas
-        // canvasContext.clearRect(0, 0, canvasContext.canvas.width, canvasContext.canvas.height);
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
 
-        actions.forEach(action => {
+        penStrokes.forEach(penStroke => {
             canvasContext.beginPath();
-            canvasContext.strokeStyle = action.color;
-            canvasContext.lineWidth = action.width;
-            canvasContext.globalCompositeOperation = action.type === 'eraser' ? 'destination-out' : 'source-over';
+            canvasContext.strokeStyle = penStroke.color;
+            canvasContext.lineWidth = penStroke.width;
+            canvasContext.globalCompositeOperation = penStroke.type === 'eraser' ? 'destination-out' : 'source-over';
 
-            const [firstPoint, ...restOfPoints] = action.path;
+            const [firstPoint, ...restOfPoints] = penStroke.path;
             canvasContext.moveTo(firstPoint.x, firstPoint.y);
+
+            console.log(firstPoint);
 
             restOfPoints.forEach(point => {
                 canvasContext.lineTo(point.x, point.y);
@@ -333,33 +405,21 @@ function MapToolPage({ onBackClick }) {
     };
 
 
-
-
     const handleClearAll = () => {
+        const newAction = {
+            type : 'eraser',
+            addedStrokes : [],
+            removedStrokes : penStrokes,
+        }
 
+        setActionStack(prev => [...prev, newAction]);
+        setPenStrokes([]);
     };
 
 
     const handleEraser = () => {
         setTool('eraser');
     }
-
-
-
-    const handleDone = () => {
-        const nonErasedAnnotations = actionStack.filter(
-            action => !erasedAnnotations.includes(action)
-        );
-
-        if (nonErasedAnnotations.length > 0) {
-            const recentAnnotation = nonErasedAnnotations[nonErasedAnnotations.length - 1];
-            const recentCoordinates = recentAnnotation.path;
-            console.log(recentCoordinates);
-        } else {
-            alert("No annotations have been made.");
-        }
-    };
-
 
 
     const handleBackClick = () => {
@@ -371,7 +431,6 @@ function MapToolPage({ onBackClick }) {
             navigate("/imagedetail");
         }
     };
-
 
 
     const loadImageAndDraw = () => {
@@ -414,7 +473,7 @@ function MapToolPage({ onBackClick }) {
             <div className="top-buttons">
                 <button onClick={handleSave}>Save</button>
                 <button onClick={handleBackClick}>Back</button>
-                <button onClick={handleDone}>Done</button>
+                {/* <button onClick={handleDone}>Done</button> */}
                 <button onClick={handleUndo}>⟲</button>
                 <button onClick={handleRedo}>⟳</button>
                 <button onClick={() => setTool('pencil')}>✏️</button>
@@ -477,27 +536,9 @@ function MapToolPage({ onBackClick }) {
                 )}
             </div>
 
-            {/*<div className="word-choice">*/}
-            {/*    <p>Choose words:</p>*/}
-            {/*    {enteredWords.map((word, index) => (*/}
-            {/*        <button key={index}>{word}</button>*/}
-            {/*    ))}*/}
-            {/*</div>*/}
-            {/*<ReactLassoSelect   // Working React Lasso Select*/}
-            {/*    value={points}*/}
-            {/*    src={src}*/}
-            {/*    onChange={value => {*/}
-            {/*        setPoints(value);*/}
-            {/*    }}*/}
-            {/*    // imageStyle={{ height: `${height}px` }}*/}
-            {/*    imageStyle={{ height: `${canvasHeight}px` }}*/}
-            {/*    onComplete={value => {*/}
-            {/*        if (!value.length) return;*/}
-            {/*        getCanvas(src, value, (err, canvas) => {*/}
-            {/*            console.log(points)*/}
-            {/*        });*/}
-            {/*    }}*/}
-            {/*/>*/}
+            <div className="word-choice">
+                <p>Selected word: {enteredWords.word}</p>
+            </div>
         </div>
     );
 }
@@ -506,4 +547,50 @@ export default MapToolPage;
 
 
 
+    // const drawSingleAction = (action, canvasContext) => {
+    //     canvasContext.beginPath();
+    //     canvasContext.strokeStyle = action.color;
+    //     canvasContext.lineWidth = action.width;
+    //     canvasContext.globalCompositeOperation = action.type === 'eraser' ? 'destination-out' : 'source-over';
+
+    //     const [firstPoint, ...restOfPoints] = action.path;
+    //     canvasContext.moveTo(firstPoint.x, firstPoint.y);
+
+    //     restOfPoints.forEach(point => {
+    //         canvasContext.lineTo(point.x, point.y);
+    //         canvasContext.stroke();
+    //     });
+
+    //     canvasContext.closePath();
+    // };
+
+
+    //const isLineClosed = (lines) => {
+    //if (lines.length < 3) return false; // We assume at least 3 points to form a closed shape
+
+    //const startPoint = lines[0];
+    //const endPoint = lines[lines.length - 1];
+    //const distance = Math.sqrt(Math.pow(endPoint.x - startPoint.x, 2) + Math.pow(endPoint.y - startPoint.y, 2));
+
+    //return distance < 5; // Threshold to determine if the start and end points are close enough to form a closed shape
+    //};
+
+
+    // const [erasedAnnotations, setErasedAnnotations] = useState([]);
+
+// const nearbyAnnotationIndex = findNearbyAnnotation(x, y);
+
+        // If near an annotation, set it as the active annotation
+        // if (nearbyAnnotationIndex !== null) {
+        //     setActiveAnnotationIndex(nearbyAnnotationIndex);
+        //     setLines(actionStack[nearbyAnnotationIndex].path);
+        // } else {
+        //     setActiveAnnotationIndex(null);
+        //     setLines([{ x, y }]);
+        // }
+
+// const loadCanvasState = (canvas, imageData) => {
+    //     const context = canvas.getContext('2d');
+    //     context.putImageData(imageData, 0, 0);
+    // }
   
