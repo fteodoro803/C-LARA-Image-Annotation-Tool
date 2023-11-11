@@ -60,7 +60,7 @@ function MapToolPage({ onBackClick }) {
                 let orderedPenStrokes = orderPenStrokes(penStrokes);
                 for (let stroke of orderedPenStrokes) {
                     for (let point of stroke.path) {
-                        newLines.append(point);
+                        newLines.push(point);
                     }
                 }
                 goalArrayJSON = convertArrayFormat(newLines);
@@ -244,36 +244,56 @@ function MapToolPage({ onBackClick }) {
     };
 
     const orderPenStrokes = (penStrokes) => {
-        penStrokesWithoutDuplicates = [...new Set(penStrokes)];
+        // let penStrokesWithoutDuplicates = [...new Set(penStrokes)];
         let orderedPenStrokes = [];
         let minimumDistance = 10000;
 
-        let closestStroke = penStrokesWithoutDuplicates[0];
-        let currentStroke = penStrokesWithoutDuplicates[0];
+
+        let closestStroke = penStrokes[0];
+        let currentStroke = penStrokes[0];
+
+        console.log("penStrokes: ", penStrokes);
 
         orderedPenStrokes.push(currentStroke);
-        while (orderedPenStrokes.length < penStrokesWithoutDuplicates.length) {
-            for (let j = 0; j <= penStrokes.length; j++) {
+        while (orderedPenStrokes.length < penStrokes.length) {
+            let endX = currentStroke.path[currentStroke.path.length - 1].x;
+            let endY = currentStroke.path[currentStroke.path.length - 1].y;
 
-                if (penStrokes[j] in orderedPenStrokes) {
-                    continue;
-                }
+            console.log("endX: ", endX);
+            console.log("endY: ", endY);
 
-                let endToEnd = Math.abs(currentStroke.endPoint.x - penStrokesWithoutDuplicates[j].endPoint.x) +
-                    Math.abs(currentStroke.endPoint.y - penStrokesWithoutDuplicates[j].endPoint.y);
-                let endToStart = Math.abs(currentStroke.endPoint.x - penStrokesWithoutDuplicates[j].endPoint.x) +
-                    Math.abs(currentStroke.startPoint.y - penStrokesWithoutDuplicates[j].startPoint.y);
+            for (let j = 0; j < penStrokes.length; j++) {
 
-                let closestPoint = endToEnd < endToStart ? endToEnd : endToStart;
+                if (penStrokes[j] !== currentStroke) {
 
-                if (closestPoint < minimumDistance) {
-                    minimumDistance = closestPoint;
-                    closestStroke = penStrokesWithoutDuplicates[j];
+                    let nextEndX = penStrokes[j].path[currentStroke.path.length - 1].x;
+                    let nextEndY = penStrokes[j].path[currentStroke.path.length - 1].y;
+                    let nextStartX = penStrokes[j].path[0].x;
+                    let nextStartY = penStrokes[j].path[0].y;
 
-                    if (closestPoint = endToEnd) {
-                        closestStroke.endPoint = penStrokesWithoutDuplicates[j].startPoint;
-                        closestStroke.startPoint = penStrokesWithoutDuplicates[j].endPoint;
-                        closestStroke.path = penStrokesWithoutDuplicates[j].path.reverse();
+                    console.log("nextEndX: ", nextEndX);
+                    console.log("nextEndY: ", nextEndY);
+                    console.log("nextStartX: ", nextStartX);
+                    console.log("nextStartY: ", nextStartY);
+
+                    let endToEnd = Math.abs(endX - nextEndX) +
+                        Math.abs(endY - nextEndY);
+                    let endToStart = Math.abs(endX - nextStartX) +
+                        Math.abs(endY - nextStartY);
+                    console.log(endToEnd);
+                    console.log(endToStart);
+
+                    let closestPoint = endToEnd < endToStart ? endToEnd : endToStart;
+
+                    console.log(closestPoint)
+
+                    if (closestPoint < minimumDistance) {
+                        minimumDistance = closestPoint;
+                        closestStroke = penStrokes[j];
+
+                        if (closestPoint === endToEnd) {
+                            closestStroke.path = penStrokes[j].path.reverse();
+                        }
                     }
                 }
             }
@@ -315,16 +335,16 @@ function MapToolPage({ onBackClick }) {
         
         setIsDrawing(false);
 
-        const uniqueLines = [...new Set(lines)];
+        // const uniqueLines = [...new Set(lines)];
 
         let newStrokes = [];
         let removedStrokes = [];
 
-        console.log("lines: ", uniqueLines);
+        console.log("lines: ", lines);
 
         if (tool === 'pencil') {
             const newStroke = {
-                path: uniqueLines,
+                path: lines,
                 startPoint: lines[0],
                 endPoint: lines[lines.length - 1],
                 color: penColor,
@@ -341,7 +361,7 @@ function MapToolPage({ onBackClick }) {
                 let oldStrokePath = [...new Set(stroke.path)];
                 let newStrokePath = [...new Set(stroke.path)];
 
-                for (let linePoint of uniqueLines) {
+                for (let linePoint of lines) {
                     for (let strokePoint of newStrokePath) {
                         if (Math.abs(linePoint.x - strokePoint.x) < 10 && Math.abs(linePoint.y - strokePoint.y) < 10) {
                             newStrokePath = newStrokePath.filter(point => point !== strokePoint);
@@ -598,18 +618,6 @@ function MapToolPage({ onBackClick }) {
                 </>
             )}
 
-            <h3>Selected Word: {enteredWords.word}</h3>
-
-            { showLassoSelect && (
-                <>
-                    <h3>Preview</h3>
-                    <img src={previewImage} alt="Lasso Preview" height={previewHeight}/>
-                </>
-            )}
-
-            <div className="word-choice">
-                <p>Selected word: {enteredWords.word}</p>
-            </div>
         </div>
     );
 }
