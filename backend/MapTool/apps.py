@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class PostAppConfig(AppConfig):
+class MapToolConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'PostApp'
+    name = 'MapTool'
