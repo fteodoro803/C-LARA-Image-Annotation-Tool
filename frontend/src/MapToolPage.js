@@ -29,6 +29,9 @@ function MapToolPage({ onBackClick }) {
     const [canvasHeight, setCanvasHeight] = useState(500);    // make a way to scale the coordinates -- make sure uses same height as pen tool height
     const [canvasWidth, setCanvasWidth] = useState(null);    // make a way to scale the coordinates -- make sure uses same height as pen tool height
 
+    // State to toggle between canvases and ReactLassoSelect
+    const [showLassoSelect, setShowLassoSelect] = useState(false);
+
 
     const [actionStack, setActionStack] = useState([]);
     const [undoStack, setUndoStack] = useState([]);
@@ -332,6 +335,25 @@ function MapToolPage({ onBackClick }) {
 
 
 
+    const loadImageAndDraw = () => {
+        const context = imageCanvasRef.current.getContext('2d');
+        const image = new Image();
+        image.src = selectedImage.file;
+        image.onload = () => {
+            const aspectRatio = image.naturalWidth / image.naturalHeight;
+            const calculatedWidth = canvasHeight * aspectRatio;
+            setCanvasWidth(calculatedWidth);
+            context.drawImage(image, 0, 0, calculatedWidth, canvasHeight);
+        };
+    };
+
+    // Reloading the Canvases on Toggle
+    useEffect(() => {
+        if (!showLassoSelect && canvasWidth && canvasHeight) {
+            loadImageAndDraw();
+        }
+    }, [showLassoSelect, canvasWidth, canvasHeight]);
+
     // Lasso Tool
     const src = selectedImage.file;
     // const [points, setPoints] = useState([]);
@@ -342,6 +364,10 @@ function MapToolPage({ onBackClick }) {
         const goalArray = sourceArray.map(item => [item.x, item.y]);
         return JSON.stringify(goalArray)
     }
+
+    const toggleDisplay = () => {
+        setShowLassoSelect(!showLassoSelect);
+    };
 
 
     return (
@@ -364,25 +390,52 @@ function MapToolPage({ onBackClick }) {
                 ))}
                 <button onClick={handleEraser}>🧽</button>
                 <button onClick={handleClearAll}>🗑️ Clear All</button>
+                <button onClick={toggleDisplay}>
+                    {showLassoSelect ? "Show Canvases" : "Show Lasso Select"}
+                </button>
 
             </div>
 
             <div className="image-container">
-                <canvas
-                    ref={canvasRef}
-                    width={canvasWidth}     // i want dynamically set Width here, to kee
-                    height={canvasHeight}
-                    style={{ position: 'absolute', zIndex: 1 }}
-                    onMouseDown={startDrawing}
-                    onMouseMove={draw}
-                    onMouseUp={stopDrawing}
-                />
-                <canvas
-                    ref={imageCanvasRef}
-                    width={canvasWidth}
-                    height={canvasHeight}
-                    style={{ position: 'relative', zIndex: 0 }}
-                />
+                { !showLassoSelect && (
+                    <>
+                        <canvas
+                            ref={canvasRef}
+                            width={canvasWidth}     // i want dynamically set Width here, to kee
+                            height={canvasHeight}
+                            style={{position: 'absolute', zIndex: 1}}
+                            onMouseDown={startDrawing}
+                            onMouseMove={draw}
+                            onMouseUp={stopDrawing}
+                        />
+                        <canvas
+                        ref={imageCanvasRef}
+                        width={canvasWidth}
+                        height={canvasHeight}
+                        style={{position: 'relative', zIndex: 0}}
+                        />
+                    </>
+                )}
+
+                { showLassoSelect && (
+                    <>
+                        <ReactLassoSelect   // React Lasso Select here is Slow
+                            value={points}
+                            src={src}
+                            onChange={value => {
+                                setPoints(value);
+                            }}
+                            // imageStyle={{ height: `${height}px` }}
+                            imageStyle={{ height: `${canvasHeight}px` }}
+                            onComplete={value => {
+                                if (!value.length) return;
+                                getCanvas(src, value, (err, canvas) => {
+                                    console.log(points)
+                                });
+                            }}
+                        />
+                    </>
+                )}
             </div>
 
             {/*<div className="word-choice">*/}
@@ -391,21 +444,21 @@ function MapToolPage({ onBackClick }) {
             {/*        <button key={index}>{word}</button>*/}
             {/*    ))}*/}
             {/*</div>*/}
-            <ReactLassoSelect
-                value={points}
-                src={src}
-                onChange={value => {
-                    setPoints(value);
-                }}
-                // imageStyle={{ height: `${height}px` }}
-                imageStyle={{ height: `${canvasHeight}px` }}
-                onComplete={value => {
-                    if (!value.length) return;
-                    getCanvas(src, value, (err, canvas) => {
-                        console.log(points)
-                    });
-                }}
-            />
+            {/*<ReactLassoSelect   // Working React Lasso Select*/}
+            {/*    value={points}*/}
+            {/*    src={src}*/}
+            {/*    onChange={value => {*/}
+            {/*        setPoints(value);*/}
+            {/*    }}*/}
+            {/*    // imageStyle={{ height: `${height}px` }}*/}
+            {/*    imageStyle={{ height: `${canvasHeight}px` }}*/}
+            {/*    onComplete={value => {*/}
+            {/*        if (!value.length) return;*/}
+            {/*        getCanvas(src, value, (err, canvas) => {*/}
+            {/*            console.log(points)*/}
+            {/*        });*/}
+            {/*    }}*/}
+            {/*/>*/}
         </div>
     );
 }
