@@ -14,6 +14,8 @@ function ImageDetailPage({ enteredWords }) {
   const [selectedWord, setSelectedWord] = useState(null);
   const navigate = useNavigate();
 
+  const [wordAddCount, setWordAddCount] = useState(0);  // Counter to Trigger Image-Word Loader when updated
+
   useEffect(() => {
     // Fetch images from the backend
     const fetchImages = async () => {
@@ -67,6 +69,7 @@ function ImageDetailPage({ enteredWords }) {
   const [words, setWords] = useState([]); // Holds the words of the selected image
   const [newWord, setNewWord] = useState('');
 
+  // Gets Words of the Image
   useEffect(() => {
     if (selectedImage) {
       const fetchWords = async () => {
@@ -79,7 +82,7 @@ function ImageDetailPage({ enteredWords }) {
       };
       fetchWords();
     }
-  }, [selectedImage]);
+  }, [selectedImage, wordAddCount]);
 
   // const handleWordAdd = async () => {
   //   const newWordValue = prompt("Enter a new word:");
@@ -118,6 +121,7 @@ function ImageDetailPage({ enteredWords }) {
             const newWordData = response.data.word;
             setEditedWords(prevWords => [...prevWords, newWordData]);
             setWords(prevWords => [...prevWords, newWordData]);
+            setWordAddCount(prevCount => prevCount + 1); // Increment the counter to trigger the useEffect hook (to reload the words)
           } else {
             console.error("Unexpected response structure:", response.data);
             alert('Word added but there was an issue displaying it.');
