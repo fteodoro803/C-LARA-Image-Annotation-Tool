@@ -4,6 +4,7 @@ import { createContext, useContext} from 'react';
 import './MapTool.css';
 import ReactLassoSelect, {getCanvas} from "react-lasso-select";
 import axios from "axios";
+import Endpoint from "./Endpoints";
 
 //access components of imageDetailPage after navigating from MapToolPage
 const ImageContext = createContext();
@@ -66,7 +67,8 @@ function MapToolPage({ onBackClick }) {
             let parsedCoordinates = JSON.parse(goalArrayJSON);
 
             // Sending the parsed array to the backend
-            const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
+            // const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
+            const response = await Endpoint.post('add_coordinates/', {
                 word_id: enteredWords.id,
                 coordinates: parsedCoordinates,
             });
@@ -416,14 +418,15 @@ function MapToolPage({ onBackClick }) {
         async function fetchCoordinates() {
             if (enteredWords && enteredWords.id) {
                 try {
-                    const response = await axios.get(`http://localhost:8000/api/coordinates/${enteredWords.id}/`);
+                    // const response = await axios.get(`http://localhost:8000/api/coordinates/${enteredWords.id}/`);
+                    const response = await Endpoint.get(`coordinates/${enteredWords.id}/`);
                     const coordinates = response.data.coordinates;
 
                     if (coordinates) {
                         const coordPoints = coordinates
                             .map(([x, y]) => ({ x, y }));
                         setPoints(coordPoints);
-                        console.log(coordPoints);
+                        // console.log(coordPoints);
                     }
                 } catch (error) {
                     console.error("Error fetching coordinates:", error);
@@ -506,6 +509,8 @@ function MapToolPage({ onBackClick }) {
                     </>
                 )}
             </div>
+
+            <h3>Selected Word: {enteredWords.word}</h3>
 
             { showLassoSelect && (
                 <>
