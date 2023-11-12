@@ -5,6 +5,13 @@
 inspired by photo editing software, such as: Lasso Tool, Draw, Erase, Undo, Save.
 
 ## Team Members
+#### Product Owner:
+Fernando Teodoro (fteodoro@student.unimelb.edu.au)
+
+#### Scrum Master:
+Nicole Penrose (npenrose@student.unimelb.edu.au)
+
+#### Development Team:
 - Fernando Teodoro (fteodoro@student.unimelb.edu.au)
 - Jahnavi Datla (jdatla@student.unimelb.edu.au)
 - Mahamithra Sivagnanam (msivagnanam@student.unimelb.edu.au)
