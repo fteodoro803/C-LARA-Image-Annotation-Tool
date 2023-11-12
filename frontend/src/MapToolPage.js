@@ -36,7 +36,7 @@ function MapToolPage({ onBackClick }) {
     const [aspectRatio, setAspectRatio] = useState(1);
 
     // State to toggle between canvases and ReactLassoSelect
-    const [showLassoSelect, setShowLassoSelect] = useState(false);
+    const [lassoSelectEnabled, setLassoSelectEnabled] = useState(false);
 
     // Instantiate the actionStack, penStrokes, and currentAction
     const [actionStack, setActionStack] = useState([]);
@@ -105,10 +105,10 @@ function MapToolPage({ onBackClick }) {
 
     // Reloading the Canvases on Toggle
     useEffect(() => {
-        if (!showLassoSelect && canvasWidth && canvasHeight) {
+        if (!lassoSelectEnabled && canvasWidth && canvasHeight) {
             loadImageAndDraw();
         }
-    }, [showLassoSelect, canvasWidth, canvasHeight]);
+    }, [lassoSelectEnabled, canvasWidth, canvasHeight]);
 
 
     // Finds the closest endpoint between a penStroke 
@@ -184,7 +184,7 @@ function MapToolPage({ onBackClick }) {
         };
 
         // Lasso Tool Selected
-        if (showLassoSelect) {
+        if (lassoSelectEnabled) {
              goalArrayJSON = convertArrayFormat(points); // Getting the JSON string
         }
         // Pen Tool Selected
@@ -456,7 +456,7 @@ function MapToolPage({ onBackClick }) {
 
     // Renders the Lasso Select canvas over the Pen Tool canvas
     const toggleDisplay = () => {
-        setShowLassoSelect(!showLassoSelect);
+        setLassoSelectEnabled(!lassoSelectEnabled);
     };
 
 
@@ -488,28 +488,29 @@ function MapToolPage({ onBackClick }) {
             <div className="top-buttons">
                 <button onClick={handleSave}>Save</button>
                 <button onClick={handleBackClick}>Back</button>
-                <button onClick={handleUndo}>⟲</button>
-                <button onClick={handleRedo}>⟳</button>
-                <button onClick={() => setTool('pencil')}>✏️</button>
+                <button onClick={handleUndo} disabled={lassoSelectEnabled}>⟲</button>
+                <button onClick={handleRedo} disabled={lassoSelectEnabled}>⟳</button>
+                <button onClick={() => setTool('pencil')} disabled={lassoSelectEnabled}>✏️</button>
                 {colors.map(color => (
                     <button
                         key={color}
                         className={`color-button ${color}`}
                         style={{ backgroundColor: color }}
                         onClick={() => setPenColor(color)}
+                        disabled={lassoSelectEnabled}
                     >
                     </button>
                 ))}
-                <button onClick={() => setTool('eraser')}>🧽</button>
-                <button onClick={handleClearAll}>🗑️ Clear All</button>
+                <button onClick={() => setTool('eraser')} disabled={lassoSelectEnabled}>🧽</button>
+                <button onClick={handleClearAll} disabled={lassoSelectEnabled}>🗑️ Clear All</button>
                 <button onClick={toggleDisplay}>
-                    {showLassoSelect ? "Disable Lasso Select" : "Enable Lasso Select"}
+                    {lassoSelectEnabled ? "Disable Lasso Select" : "Enable Lasso Select"}
                 </button>
 
             </div>
 
             <div className="image-container">
-                { !showLassoSelect && (
+                { !lassoSelectEnabled && (
                     <>
                         <canvas
                             ref={canvasRef}
@@ -529,7 +530,7 @@ function MapToolPage({ onBackClick }) {
                     </>
                 )}
 
-                { showLassoSelect && (
+                { lassoSelectEnabled && (
                     <>
                         <ReactLassoSelect   // React Lasso Select here is Slow
                             value={points}
@@ -556,7 +557,7 @@ function MapToolPage({ onBackClick }) {
 
             <h3>Selected Word: {selectedWord.word}</h3>
 
-            { showLassoSelect && (
+            { lassoSelectEnabled && (
                 <>
                     <h3>Preview</h3>
                     <img src={previewImage} alt="Lasso Preview" height={previewHeight}/>
