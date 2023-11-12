@@ -9,6 +9,7 @@ from .serializers import ImageSerializer, WordSerializer
 import os
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from django.views import View
 from django.http import FileResponse
 
@@ -21,7 +22,7 @@ class UploadImageView(APIView):
         name = request.data.get('name')
 
         # Check if the uploaded file is an image
-        if image and self.is_image(image):
+        if image and self.is_image(image) and name:
             upload = Image.objects.create(name=name, file=image)
             upload.save()
             return Response({
@@ -76,14 +77,16 @@ class DeleteImageView(DestroyAPIView):
         # Deleting the database record
         image.delete()
 
-        return Response({"message": "Image deleted."})  # Make this Response better, like theo ther functions
+        return Response({"message": "Image deleted."})  # Make this Response more detailed
 
 class AddWordView(APIView):
     def post(self, request, *args, **kwargs):
         word_text = request.data.get('word')
-        image_id = request.data.get('image_id')     #~note change this to imageID
+        image_id = request.data.get('image_id')
 
-        if word_text and image_id:
+        image_in_database = Image.objects.filter(id=image_id).exists()
+
+        if word_text and image_id and image_in_database:
             image = Image.objects.get(id=image_id)
             word = Word.objects.create(word=word_text, imageID=image)
             word.save()
@@ -105,6 +108,11 @@ class ListWordsView(ListAPIView):
 
     def get_queryset(self):
         image_id = self.kwargs['image_id']
+
+        # Check if the Image with the given image_id exists
+        if not Image.objects.filter(id=image_id).exists():
+            raise Http404("Image not found")
+
         return Word.objects.filter(imageID=image_id)
 
 class DeleteWordView(DestroyAPIView):
@@ -138,10 +146,16 @@ class AddCoordinateView(APIView):
         new_coordinates = request.data.get('coordinates')
         tool_used = request.data.get('toolUsed')
 
+        # Check if the word exists in the database
+        if not Word.objects.filter(id=word_id).exists():
+            return Response({
+                "message": "Invalid request. Word ID does not exist.",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         if word_id:
             word = Word.objects.get(id=word_id)
 
-            # If new_coordinates is an empty string, set it to an empty list (or maybe an empty table check with Manny) ~note
+            # If new_coordinates is an empty string, set it to an empty list
             if new_coordinates == None:
                 new_coordinates = []
 
@@ -160,7 +174,6 @@ class AddCoordinateView(APIView):
             return Response({
                 "message": "Invalid request. Word ID and coordinates are required.",
             }, status=status.HTTP_400_BAD_REQUEST)
-
 
 class FetchCoordinatesView(APIView):
 
