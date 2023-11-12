@@ -282,7 +282,7 @@ function MapToolPage({ onBackClick }) {
         const userConfirmed = window.confirm("Proceed without saving your progress?");
         if (userConfirmed) {
             navigate("/imagedetail");
-        } 
+        }
     };
 
 
@@ -296,7 +296,7 @@ function MapToolPage({ onBackClick }) {
 
         const x = e.clientX - canvasRef.current.offsetLeft;
         const y = e.clientY - canvasRef.current.offsetTop;
-        
+
         context.moveTo(x, y); // Move the context path to the starting point without creating a line
         setLines([{ x, y }]);
 
@@ -342,7 +342,7 @@ function MapToolPage({ onBackClick }) {
 
     // Updates penStrokes and actionStack based on the input of the finished draw action
     const stopDrawing = () => {
-        
+
         setIsDrawing(false);
 
         if (tool === 'pencil') {
@@ -373,7 +373,7 @@ function MapToolPage({ onBackClick }) {
 
             // Checks if any coordinates of the erased line overlaps with any existing stroke
             if (penStrokes.length > 0) {
-                for (let stroke of penStrokes) {                    
+                for (let stroke of penStrokes) {
                     for (let linePoint of lines) {
                         for (let strokePoint of stroke.path) {
                             // Deletes the stroke from nonErasedStrokes if erased line overlaps
@@ -438,6 +438,10 @@ function MapToolPage({ onBackClick }) {
             const calculatedWidth = canvasHeight * aspectRatio;
             setCanvasWidth(calculatedWidth);
             context.drawImage(image, 0, 0, calculatedWidth, canvasHeight);
+
+            // Redraw the pencil strokes after the image is loaded and drawn
+            const penContext = canvasRef.current.getContext('2d');
+            redrawCanvas(penStrokes, penContext);
         };
     };
 
@@ -555,10 +559,10 @@ function MapToolPage({ onBackClick }) {
                 )}
             </div>
 
-            <div className="selected-word-box"> 
+            <div className="selected-word-box">
                 <h3>Selected Word: "{selectedWord.word}"</h3>
             </div>
-            
+
 
             { lassoSelectEnabled && (
                 <>
