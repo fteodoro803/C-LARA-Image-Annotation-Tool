@@ -536,7 +536,10 @@ function MapToolPage({ onBackClick }) {
                 )}
             </div>
 
-            <h3>Selected Word: {selectedWord.word}</h3>
+            <div className="selected-word-box"> 
+                <h3>Selected Word: "{selectedWord.word}"</h3>
+            </div>
+            
 
             { showLassoSelect && (
                 <>

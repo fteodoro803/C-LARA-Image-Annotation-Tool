@@ -31,7 +31,7 @@ function MainApp() {
   // Image Upload Constants and Functions
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageName, setImageName] = useState("");
-  
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
@@ -112,10 +112,11 @@ function MainApp() {
                     }}
                     onClick={() => setSelectedImageIndex(index)}
                 />
-                <button onClick={() => handleDelete(image.id)}>Delete</button>
+                <button className="small-red-button" onClick={() => handleDelete(image.id)}>Delete</button>
               </div>
           ))}
         </div>
+      
     );
   }
 
@@ -167,16 +168,16 @@ function MainApp() {
               {/*Image Upload Section*/}
               <h2>Upload Image:</h2>
               <input type="file" onChange={handleFileChange} />
-              <button onClick={handleUpload}>Upload</button>
+              <button className="small-grey-button" onClick={handleUpload}>Upload</button>
 
               {/*Image Display Section*/}
               <ImageDisplaySection files={files} handleImageSelect={handleImageSelect} selectedImages={selectedImages} setSelectedImageIndex={setSelectedImageIndex} />
               <DeleteSelectedButton selectedImages={selectedImages} handleDeleteSelected={handleDeleteSelected} />
 
-              <button className="word-add-button" onClick={handleProceedClick}>Proceed</button>
+              <button className="large-blue-button" onClick={handleProceedClick}>Proceed</button>
               <br></br>
               <hr></hr>
-              <button className="word-edit-button" onClick={handleJSONButtonClick}>Generate JSON File</button>
+              <button className="large-grey-button" onClick={handleJSONButtonClick}>Generate JSON File</button>
             </div>
           } />
         </Routes>
