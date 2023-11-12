@@ -3,11 +3,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { createContext, useContext} from 'react';
 import './MapTool.css';
 import ReactLassoSelect, {getCanvas} from "react-lasso-select";
-import axios from "axios";
 import Endpoint from "./Endpoints";
+
 
 // Access components of imageDetailPage after navigating to MapToolPage
 const ImageContext = createContext();
+
 
 export const ImageProvider = ({ children }) => {
     const [images, setImages] = useState([]);
@@ -26,7 +27,7 @@ export const useImageStore = () => useContext(ImageContext);
 function MapToolPage({ onBackClick }) {
     const location = useLocation();
     const selectedImage = location.state?.selectedImage;
-    const enteredWords = location.state?.enteredWords;  // note: should probably be renamed to selectedWord
+    const selectedWord = location.state?.selectedWord;  // note: should probably be renamed to selectedWord
     const [points, setPoints] = useState([]);
 
     const [canvasHeight, setCanvasHeight] = useState(500);    // make a way to scale the coordinates -- make sure uses same height as pen tool height
@@ -164,7 +165,7 @@ function MapToolPage({ onBackClick }) {
              goalArrayJSON = convertArrayFormat(points); // Getting the JSON string
         }
         // Pen Tool Selected
-        else {
+        else if (penStrokes.length > 0) {
             let orderedPoints = [];
             let orderedPenStrokes = orderPenStrokes(penStrokes);
 
@@ -184,18 +185,29 @@ function MapToolPage({ onBackClick }) {
             let parsedCoordinates = JSON.parse(goalArrayJSON);
 
             // Sending the parsed array to the backend
-            // const response = await axios.post(`http://localhost:8000/api/add_coordinates/`, {
             const response = await Endpoint.post('add_coordinates/', {
-                word_id: enteredWords.id,
+                word_id: selectedWord.id,
                 coordinates: parsedCoordinates,
             });
 
             console.log("Coordinates updated successfully:", response.data);
+            alert("Progress saved successfully!");
 
         } catch (error) {
             console.error("Error updating coordinates:", error);
         }
     }
+
+
+    const addActionToStack = (newAction) => {
+        setActionStack(prevActionStack => {
+            const stackWithNewAction = [...prevActionStack, newAction];
+            while (stackWithNewAction.length > 5) {
+                stackWithNewAction.shift();
+            }
+            return stackWithNewAction;
+        });
+    };
 
 
     const handleUndo = () => {
@@ -216,7 +228,8 @@ function MapToolPage({ onBackClick }) {
 
         const actionToRedo = redoStack[redoStack.length - 1];
         setRedoStack(prevRedoStack => prevRedoStack.slice(0, -1));
-        setActionStack(prevActionStack => [...prevActionStack, actionToRedo]);
+
+        addActionToStack(actionToRedo);
 
         setPenStrokes(actionToRedo.newState);
     };
@@ -229,7 +242,8 @@ function MapToolPage({ onBackClick }) {
             newState : [],
         }
 
-        setActionStack(prev => [...prev, newAction]);
+        addActionToStack(newAction);
+
         setPenStrokes([]);
     };
 
@@ -240,17 +254,14 @@ function MapToolPage({ onBackClick }) {
 
 
     const handleBackClick = () => {
-        const userConfirmed = window.confirm("Do you want to save your progress?");
+        const userConfirmed = window.confirm("Proceed without saving your progress?");
         if (userConfirmed) {
-            // Save logic here
             navigate("/imagedetail");
-        } else {
-            navigate("/imagedetail");
-        }
+        } 
     };
 
 
-    // sets tool and sets tool characteristics
+    // Sets tool and sets tool characteristics
     const startDrawing = (e) => {
         setIsDrawing(true);
 
@@ -258,7 +269,6 @@ function MapToolPage({ onBackClick }) {
         const context = canvas.getContext('2d');
         context.beginPath(); // Start a new path
 
-        // Determine if starting near an existing annotation
         const x = e.clientX - canvasRef.current.offsetLeft;
         const y = e.clientY - canvasRef.current.offsetTop;
         
@@ -269,7 +279,7 @@ function MapToolPage({ onBackClick }) {
         const currentState = [...penStrokes];
 
         setCurrentAction({
-            type: tool, // example action type
+            type: tool,
             previousState: currentState
         });
 
@@ -318,13 +328,12 @@ function MapToolPage({ onBackClick }) {
 
             const newState = [...penStrokes, newStroke];
 
-            setActionStack(prevActionStack => [
-                ...prevActionStack,
+            addActionToStack(
                 {
-                    ...currentAction,
-                    newState: newState
+                ...currentAction,
+                newState: newState
                 }
-            ]);
+            );
 
             setPenStrokes(newState);
 
@@ -348,13 +357,12 @@ function MapToolPage({ onBackClick }) {
 
             const newState = nonErasedStrokes;
 
-            setActionStack(prevActionStack => [
-                ...prevActionStack,
+            addActionToStack(
                 {
-                    ...currentAction,
-                    newState: newState
+                ...currentAction,
+                newState: newState
                 }
-            ]);
+            );
 
             setPenStrokes(newState);
 
@@ -425,17 +433,15 @@ function MapToolPage({ onBackClick }) {
     // Gets and Converts Coordinates from Backend to ReactLassoSelect Format
     useEffect(() => {
         async function fetchCoordinates() {
-            if (enteredWords && enteredWords.id) {
+            if (selectedWord && selectedWord.id) {
                 try {
-                    // const response = await axios.get(`http://localhost:8000/api/coordinates/${enteredWords.id}/`);
-                    const response = await Endpoint.get(`coordinates/${enteredWords.id}/`);
+                    const response = await Endpoint.get(`coordinates/${selectedWord.id}/`);
                     const coordinates = response.data.coordinates;
 
                     if (coordinates) {
                         const coordPoints = coordinates
                             .map(([x, y]) => ({ x, y }));
                         setPoints(coordPoints);
-                        // console.log(coordPoints);
                     }
                 } catch (error) {
                     console.error("Error fetching coordinates:", error);
@@ -444,7 +450,7 @@ function MapToolPage({ onBackClick }) {
         }
 
         fetchCoordinates();
-    }, [enteredWords]);
+    }, [selectedWord]);
 
 
     return (
@@ -477,7 +483,7 @@ function MapToolPage({ onBackClick }) {
                     <>
                         <canvas
                             ref={canvasRef}
-                            width={canvasWidth}     // i want dynamically set Width here, to kee
+                            width={canvasWidth}
                             height={canvasHeight}
                             style={{position: 'absolute', zIndex: 1}}
                             onMouseDown={startDrawing}
@@ -518,7 +524,7 @@ function MapToolPage({ onBackClick }) {
                 )}
             </div>
 
-            <h3>Selected Word: {enteredWords.word}</h3>
+            <h3>Selected Word: {selectedWord.word}</h3>
 
             { showLassoSelect && (
                 <>
