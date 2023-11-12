@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { createContext, useContext} from 'react';
 import './MapTool.css';
 import ReactLassoSelect, {getCanvas} from "react-lasso-select";
+import axios from "axios";
 import Endpoint from "./Endpoints";
 
 // Access components of imageDetailPage after navigating to MapToolPage
@@ -416,9 +417,9 @@ function MapToolPage({ onBackClick }) {
     };
 
 
-    // function convertCoordinatesToString(coordinates) {
-    //     return coordinates.map(pair => pair.join(',')).join(' ');
-    // }
+    function convertCoordinatesToString(coordinates) {
+        return coordinates.map(pair => pair.join(',')).join(' ');
+    }
 
 
     // Gets and Converts Coordinates from Backend to ReactLassoSelect Format
