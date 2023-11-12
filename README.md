@@ -11,8 +11,13 @@ inspired by photo editing software, such as: Lasso Tool, Draw, Erase, Undo, Save
 - Nicole Penrose (npenrose@student.unimelb.edu.au)
 - Ranumi Gihansa Wijeyesinghe (rwijeyesingh@student.unimelb.edu.au)
 
-## Features (Add GIFs here)
+## Features
 - Draw Tool: Allows the user to draw on the image.
+  - Pen tool: Allows user to draw continuous strokes on the canvas.
+  - Eraser tool: Allows user to erase entire strokes. 
+  - Undo button: Removes previous action from canvas.
+  - Redo button: Restores previously removed action to canvas.
+  - Clear all: Clears all annotations from canvas. 
 - Lasso Tool: Allows the user to select a region of the image by drawing a closed loop around the region.
   - Selection
     - Click on the Image to start the Lasso Selection process
@@ -95,6 +100,13 @@ Relevant documentation is available in PDF format in /docs.
 - Implemented Lasso tool functionality [frontend-backend-merge]
 - All changes merged to release branch [sprint-3-release] 
 
+#### Final Release
+- Integrated functionality for pen tool and lasso tool [sprint-3-release-pen-and-lasso]
+- Fixed bugs relating to eraser and pen stroke rendering [sprint-3-release-pen-and-lasso]
+- Updated eraser tool to erase entire strokes instead of points [sprint-3-release-pen-and-lasso]
+- Cleaned up code and repository, added comments [sprint-3-release-pen-and-lasso]
+- Merged final release and changes onto main branch [main]
+
 ## Testing
 Backend testing was conducted in [database-testing]
 - Test Cases in `backend/MapTool/tests` directory:
@@ -106,6 +118,7 @@ Testing is still in progress, but is being updated continually in the following 
 - [Front-End Testing Strategy](https://team029.atlassian.net/l/cp/kHBpHiFr)
 - [Back-End Testing Process](https://team029.atlassian.net/l/cp/yhE0L0Sw)
 - [Bugs](https://team029.atlassian.net/wiki/spaces/SD/pages/10223620/Reported+Bugs?atlOrigin=eyJpIjoiOTdiYjBlOWVhYWIxNDQ5Mzg1MTQ2Y2Q2MGQxMDYyMDIiLCJwIjoiYyJ9)
+- [Performance and Stability Test](https://team029.atlassian.net/wiki/spaces/SD/pages/12910757/Performance+and+Stability+Test)
 
 ## Acknowledgements
 - [Language and Reading Assistant (LARA)](https://www.unige.ch/callector/lara)
