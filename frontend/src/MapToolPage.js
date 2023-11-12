@@ -32,6 +32,8 @@ function MapToolPage({ onBackClick }) {
 
     const [canvasHeight, setCanvasHeight] = useState(500);    // make a way to scale the coordinates -- make sure uses same height as pen tool height
     const [canvasWidth, setCanvasWidth] = useState(null);    // make a way to scale the coordinates -- make sure uses same height as pen tool height
+    const [scalingFactor, setScalingFactor] = useState(1);
+    const [aspectRatio, setAspectRatio] = useState(1);
 
     // State to toggle between canvases and ReactLassoSelect
     const [showLassoSelect, setShowLassoSelect] = useState(false);
@@ -54,6 +56,7 @@ function MapToolPage({ onBackClick }) {
     const dropdownRef = useRef(null);
 
     const [redoStack, setRedoStack] = useState([]);
+
 
 
     useEffect(() => {
@@ -89,9 +92,13 @@ function MapToolPage({ onBackClick }) {
         image.onload = () => {
 
             // Calculate width based on the aspect ratio
-            const aspectRatio = image.naturalWidth / image.naturalHeight;
+            setAspectRatio(image.naturalWidth / image.naturalHeight);
             const calculatedWidth = canvasHeight * aspectRatio;
             setCanvasWidth(calculatedWidth); // Set the calculated width
+
+
+            setScalingFactor(canvasHeight / image.naturalHeight);
+
             context.drawImage(image, 0, 0, calculatedWidth, canvasHeight);
         }
     }
@@ -160,15 +167,31 @@ function MapToolPage({ onBackClick }) {
 
         let goalArrayJSON;
 
+        // Adjust points to original scale before saving
+
+        const adjustPointsToOriginalScale = (penStrokes) => {
+            return penStrokes.map(stroke => ({
+                ...stroke,
+                path: stroke.path.map(point => ({
+                    // x: point.x,
+                    // y: point.y
+                    x: Math.round(point.x /scalingFactor),
+                    y: Math.round(point.y / scalingFactor)
+
+                }))
+            }));
+        };
+
         // Lasso Tool Selected
         if (showLassoSelect) {
              goalArrayJSON = convertArrayFormat(points); // Getting the JSON string
         }
         // Pen Tool Selected
         else if (penStrokes.length > 0) {
-            let orderedPoints = [];
-            let orderedPenStrokes = orderPenStrokes(penStrokes);
+            let adjustedPenStrokes = adjustPointsToOriginalScale(penStrokes);
+            let orderedPenStrokes = orderPenStrokes(adjustedPenStrokes);
 
+            let orderedPoints = [];
             for (let stroke of orderedPenStrokes) {
                 for (let point of stroke.path) {
                     orderedPoints.push(point);
@@ -180,7 +203,6 @@ function MapToolPage({ onBackClick }) {
         else {
             goalArrayJSON = convertArrayFormat([]);
         }
-
         console.log(goalArrayJSON);
 
         try {
