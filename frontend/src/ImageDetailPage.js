@@ -36,16 +36,6 @@ function ImageDetailPage() {
   };
 
 
-  const handleWordEditDone = (e, index) => {
-    if (e.key === "Enter") {
-      const newWords = [...editedWords];
-      newWords[index] = e.target.value;
-      setEditedWords(newWords);
-      setIsEditingMode(false);
-    }
-  };
-
-
   // Gets Words of the Image
   useEffect(() => {
     if (selectedImage) {
@@ -62,6 +52,7 @@ function ImageDetailPage() {
   }, [selectedImage, wordAddCount]);
 
 
+  // Adds word to database and renders on page
   const handleWordAdd = async () => {
     const newWordValue = prompt("Enter a new word:");
 
@@ -95,6 +86,8 @@ function ImageDetailPage() {
     }
   };
 
+
+  // Removes word metadata from backend 
   const handleWordDelete = async (wordId) => {
     try {
       await Endpoint.delete(`delete_word/${wordId}/`);
@@ -106,6 +99,18 @@ function ImageDetailPage() {
   };
 
 
+  // Helper function for the Edit Word popup
+  const handleWordEditDone = (e, index) => {
+    if (e.key === "Enter") {
+      const newWords = [...editedWords];
+      newWords[index] = e.target.value;
+      setEditedWords(newWords);
+      setIsEditingMode(false);
+    }
+  };
+
+
+  // Updates the 'word' attribute of the edited word in backend
   const handleWordEdit = async (wordId, newWord) => {
     try {
       const response = await Endpoint.put(`edit_word/${wordId}/`, {
@@ -123,6 +128,7 @@ function ImageDetailPage() {
   };
 
 
+  // Redirects user to mapping tool for chosen image and word
   const handleMapButtonClick = (selectedImage, word) => {
     console.log(selectedImage, word)
     if (!word) {
@@ -138,11 +144,12 @@ function ImageDetailPage() {
   };
 
 
+  // Redirects user back to Upload Page
   const handleBackButtonClick = () => {
     navigate('/');
   };
 
-
+  
   return (
 
       <div className="image-detail-container">

@@ -27,7 +27,7 @@ export const useImageStore = () => useContext(ImageContext);
 function MapToolPage({ onBackClick }) {
     const location = useLocation();
     const selectedImage = location.state?.selectedImage;
-    const selectedWord = location.state?.selectedWord;  // note: should probably be renamed to selectedWord
+    const selectedWord = location.state?.selectedWord;
     const [points, setPoints] = useState([]);
 
     const [canvasHeight, setCanvasHeight] = useState(500);    // make a way to scale the coordinates -- make sure uses same height as pen tool height
@@ -38,6 +38,7 @@ function MapToolPage({ onBackClick }) {
     // State to toggle between canvases and ReactLassoSelect
     const [showLassoSelect, setShowLassoSelect] = useState(false);
 
+    // Instantiate the actionStack, penStrokes, and currentAction
     const [actionStack, setActionStack] = useState([]);
     const [penStrokes, setPenStrokes] = useState([]);
     const [currentAction, setCurrentAction] = useState(null);
@@ -58,7 +59,6 @@ function MapToolPage({ onBackClick }) {
     const [redoStack, setRedoStack] = useState([]);
 
 
-
     useEffect(() => {
         function handleClickOutside(event) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -72,7 +72,8 @@ function MapToolPage({ onBackClick }) {
         };
     }, []);
 
-    // Canvas Generation
+
+    // Initial Canvas Generation
     useEffect(() => {
         const context = imageCanvasRef.current.getContext('2d');
         drawImageToCanvas(context);
@@ -86,6 +87,7 @@ function MapToolPage({ onBackClick }) {
     }, [penStrokes]);
 
 
+    // Renders the selected image on the canvas
     const drawImageToCanvas = (context) => {
         const image = new Image();
         image.src = selectedImage.file;
@@ -95,10 +97,7 @@ function MapToolPage({ onBackClick }) {
             setAspectRatio(image.naturalWidth / image.naturalHeight);
             const calculatedWidth = canvasHeight * aspectRatio;
             setCanvasWidth(calculatedWidth); // Set the calculated width
-
-
             setScalingFactor(canvasHeight / image.naturalHeight);
-
             context.drawImage(image, 0, 0, calculatedWidth, canvasHeight);
         }
     }
@@ -156,6 +155,7 @@ function MapToolPage({ onBackClick }) {
                     }
                 }
             }
+
             orderedPenStrokes.push(closestStroke);
             currentStroke = closestStroke;
         }
@@ -163,6 +163,7 @@ function MapToolPage({ onBackClick }) {
     };
 
 
+    // Handles saving of mapping coordinates to database
     const handleSave = async () => {
 
         let goalArrayJSON;
@@ -224,6 +225,7 @@ function MapToolPage({ onBackClick }) {
     }
 
 
+    // If the action stack exceeds a length of 5 when adding a new action, remove the first action in the stack
     const addActionToStack = (newAction) => {
         setActionStack(prevActionStack => {
             const stackWithNewAction = [...prevActionStack, newAction];
@@ -235,6 +237,7 @@ function MapToolPage({ onBackClick }) {
     };
 
 
+    // Removes the previous action from the action stack and the associated pen strokes from the canvas
     const handleUndo = () => {
         if (actionStack.length === 0) return;
 
@@ -246,9 +249,9 @@ function MapToolPage({ onBackClick }) {
         setPenStrokes(previousPenStrokes);
     };
 
-
+    // Restores the most recently removed action in the action stack and adds the associated pen strokes back to the canvas
     const handleRedo = () => {
-        console.log("redo");
+
         if (redoStack.length === 0) return;
 
         const actionToRedo = redoStack[redoStack.length - 1];
@@ -260,6 +263,7 @@ function MapToolPage({ onBackClick }) {
     };
 
 
+    // Removes all pen strokes from the canvas and adds the 'Clear All' action to the action stack
     const handleClearAll = () => {
         const newAction = {
             type : 'eraser',
@@ -273,11 +277,7 @@ function MapToolPage({ onBackClick }) {
     };
 
 
-    const handleEraser = () => {
-        setTool('eraser');
-    }
-
-
+    // Navigates back to the Image Detail Page
     const handleBackClick = () => {
         const userConfirmed = window.confirm("Proceed without saving your progress?");
         if (userConfirmed) {
@@ -300,7 +300,7 @@ function MapToolPage({ onBackClick }) {
         context.moveTo(x, y); // Move the context path to the starting point without creating a line
         setLines([{ x, y }]);
 
-        // Saves the current state of the page 
+        // Saves the current state of the canvas to the draw action
         const currentState = [...penStrokes];
 
         setCurrentAction({
@@ -312,6 +312,7 @@ function MapToolPage({ onBackClick }) {
     };
 
 
+    // Stores coordinates of mouse input during draw action
     const draw = (e) => {
         if (!isDrawing || !tool) return;
 
@@ -339,6 +340,7 @@ function MapToolPage({ onBackClick }) {
     };
 
 
+    // Updates penStrokes and actionStack based on the input of the finished draw action
     const stopDrawing = () => {
         
         setIsDrawing(false);
@@ -360,6 +362,7 @@ function MapToolPage({ onBackClick }) {
                 }
             );
 
+            // Updates penStrokes with the result of the pencil action
             setPenStrokes(newState);
 
             setCurrentAction(null);
@@ -368,10 +371,12 @@ function MapToolPage({ onBackClick }) {
         else if (tool === 'eraser') {
             let nonErasedStrokes = penStrokes;
 
+            // Checks if any coordinates of the erased line overlaps with any existing stroke
             if (penStrokes.length > 0) {
                 for (let stroke of penStrokes) {                    
                     for (let linePoint of lines) {
                         for (let strokePoint of stroke.path) {
+                            // Deletes the stroke from nonErasedStrokes if erased line overlaps
                             if (Math.abs(linePoint.x - strokePoint.x) < 10 && Math.abs(linePoint.y - strokePoint.y) < 10) {
                                 nonErasedStrokes = nonErasedStrokes.filter(currentStroke => currentStroke !== stroke);
                             }
@@ -389,6 +394,7 @@ function MapToolPage({ onBackClick }) {
                 }
             );
 
+            // Updates penStrokes with the result of the erase action
             setPenStrokes(newState);
 
             setCurrentAction(null);
@@ -396,6 +402,7 @@ function MapToolPage({ onBackClick }) {
     };
 
 
+    // Renders the annotation canvas by redrawing all of the pen strokes
     const redrawCanvas = (penStrokes, canvasContext) => {
 
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -421,6 +428,7 @@ function MapToolPage({ onBackClick }) {
     };
 
 
+    // Re-renders Canvas
     const loadImageAndDraw = () => {
         const context = imageCanvasRef.current.getContext('2d');
         const image = new Image();
@@ -439,20 +447,17 @@ function MapToolPage({ onBackClick }) {
     const [previewImage, setPreviewImage] = useState();
     const [previewHeight, setPreviewHeight] = useState(200);
 
+
     function convertArrayFormat(sourceArray) {
         const goalArray = sourceArray.map(item => [item.x, item.y]);
         return JSON.stringify(goalArray)
     }
 
 
+    // Renders the Lasso Select canvas over the Pen Tool canvas
     const toggleDisplay = () => {
         setShowLassoSelect(!showLassoSelect);
     };
-
-
-    function convertCoordinatesToString(coordinates) {
-        return coordinates.map(pair => pair.join(',')).join(' ');
-    }
 
 
     // Gets and Converts Coordinates from Backend to ReactLassoSelect Format
@@ -495,7 +500,7 @@ function MapToolPage({ onBackClick }) {
                     >
                     </button>
                 ))}
-                <button onClick={handleEraser}>🧽</button>
+                <button onClick={() => setTool('eraser')}>🧽</button>
                 <button onClick={handleClearAll}>🗑️ Clear All</button>
                 <button onClick={toggleDisplay}>
                     {showLassoSelect ? "Disable Lasso Select" : "Enable Lasso Select"}
