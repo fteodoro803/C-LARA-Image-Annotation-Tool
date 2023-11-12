@@ -53,7 +53,7 @@ function MainApp() {
 
         try {
             const response = await Endpoint.post('upload/', formData);
-            console.log("Uploaded successfully:", response.data);
+            // console.log("Uploaded successfully:", response.data);
 
             const imagesResponse = await Endpoint.get('images/');
 
@@ -88,7 +88,7 @@ function MainApp() {
             const response = await Endpoint.get('images/');
 
             setImages(response.data);
-            console.log("Image deleted successfully")
+            // console.log("Image deleted successfully")
         } catch (error) {
             console.error("Error deleting image:", error);
         }
@@ -98,7 +98,7 @@ function MainApp() {
     // Displays the uploaded images in the image container
     function ImageDisplaySection({ setSelectedImageIndex }) {
         return (
-            <div className="test-container">
+            <div className="images-container">
                 {images.map((image, index) => (
                     <div key={image.id} className="image-item">
                         <img

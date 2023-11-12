@@ -91,7 +91,7 @@ function ImageDetailPage() {
     const handleWordDelete = async (wordId) => {
         try {
             await Endpoint.delete(`delete_word/${wordId}/`);
-            console.log("Word deleted successfully");
+            // console.log("Word deleted successfully");
             setWords(prevWords => prevWords.filter(word => word.id !== wordId)); // Updating the word list
         } catch (error) {
             console.error("Error deleting word:", error);
@@ -116,7 +116,7 @@ function ImageDetailPage() {
             const response = await Endpoint.put(`edit_word/${wordId}/`, {
                 word: newWord,
             });
-            console.log("Word edited successfully:", response.data);
+            // console.log("Word edited successfully:", response.data);
             setWords(prevWords =>
                 prevWords.map(word =>
                     word.id === wordId ? {...word, word: newWord} : word
@@ -130,7 +130,7 @@ function ImageDetailPage() {
 
     // Redirects user to mapping tool for chosen image and word
     const handleMapButtonClick = (selectedImage, word) => {
-        console.log(selectedImage, word)
+        // console.log(selectedImage, word)
         if (!word) {
             alert('Please select a word first.');
             return;

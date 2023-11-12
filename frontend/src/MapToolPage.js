@@ -84,6 +84,7 @@ function MapToolPage({ onBackClick }) {
     useEffect(() => {
         const context = canvasRef.current.getContext('2d');
         redrawCanvas(penStrokes, context);
+        // console.log(penStrokes);
     }, [penStrokes]);
 
 
@@ -212,7 +213,7 @@ function MapToolPage({ onBackClick }) {
         else {
             goalArrayJSON = convertArrayFormat([]);
         }
-        console.log(goalArrayJSON);
+        // console.log(goalArrayJSON);
 
         try {
             // Parsing the JSON string back to an array
@@ -222,9 +223,10 @@ function MapToolPage({ onBackClick }) {
             const response = await Endpoint.post('add_coordinates/', {
                 word_id: selectedWord.id,
                 coordinates: parsedCoordinates,
+                toolUsed: lassoSelectEnabled ? "lasso" : "pencil",
             });
 
-            console.log("Coordinates updated successfully:", response.data);
+            // console.log("Coordinates updated successfully:", response.data);
             alert("Progress saved successfully!");
 
         } catch (error) {
@@ -424,7 +426,7 @@ function MapToolPage({ onBackClick }) {
             const [firstPoint, ...restOfPoints] = penStroke.path;
             canvasContext.moveTo(firstPoint.x, firstPoint.y);
 
-            console.log(firstPoint);
+            // console.log(firstPoint);
 
             restOfPoints.forEach(point => {
                 canvasContext.lineTo(point.x, point.y);
@@ -472,7 +474,7 @@ function MapToolPage({ onBackClick }) {
     };
 
 
-    // Gets and Converts Coordinates from Backend to ReactLassoSelect Format
+    // Gets Coordinates to be Loaded on Page Load
     useEffect(() => {
         async function fetchCoordinates() {
             if (selectedWord && selectedWord.id) {
@@ -480,11 +482,24 @@ function MapToolPage({ onBackClick }) {
                     const response = await Endpoint.get(`coordinates/${selectedWord.id}/`);
                     const coordinates = response.data.coordinates;
 
-                    if (coordinates) {
-                        const coordPoints = coordinates
-                            .map(([x, y]) => ({ x, y }));
+                    // Logic for Loading Points
+                    if (coordinates && response.data.toolUsed === "lasso") {
+                        const coordPoints = coordinates.map(([x, y]) => ({ x, y }));
                         setPoints(coordPoints);
                     }
+                    // else if (coordinates && response.data.toolUsed === "pencil") {       // Disabled Functionality for Loading Pencil Tool Points
+                    //     const newPenStroke = {
+                    //         path: coordinates.map(([x, y]) => ({
+                    //             x: x * scalingFactor,
+                    //             y: y * scalingFactor
+                    //         })),
+                    //         color: 'black',
+                    //         width: 2
+                    //     };
+                    //     setPenStrokes(prev => [...prev, newPenStroke]);
+                    //     console.log(penStrokes);
+                    // }
+
                 } catch (error) {
                     console.error("Error fetching coordinates:", error);
                 }
