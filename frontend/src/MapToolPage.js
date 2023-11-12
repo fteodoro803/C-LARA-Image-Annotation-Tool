@@ -37,6 +37,8 @@ function MapToolPage({ onBackClick }) {
 
     // State to toggle between canvases and ReactLassoSelect
     const [lassoSelectEnabled, setLassoSelectEnabled] = useState(false);
+    const [progressSaved, setProgressSaved] = useState(false);
+
 
     // Instantiate the actionStack, penStrokes, and currentAction
     const [actionStack, setActionStack] = useState([]);
@@ -214,6 +216,7 @@ function MapToolPage({ onBackClick }) {
             goalArrayJSON = convertArrayFormat([]);
         }
         // console.log(goalArrayJSON);
+        setProgressSaved(true);
 
         try {
             // Parsing the JSON string back to an array
@@ -289,9 +292,15 @@ function MapToolPage({ onBackClick }) {
 
     // Navigates back to the Image Detail Page
     const handleBackClick = () => {
-        const userConfirmed = window.confirm("Proceed without saving your progress?");
-        if (userConfirmed) {
+        if (!progressSaved) {
+            const userConfirmed = window.confirm("Proceed without saving your progress?");
+
+            if (userConfirmed) {
+                navigate("/imagedetail");
+            }
+        } else {
             navigate("/imagedetail");
+            setProgressSaved(false);
         }
     };
 
