@@ -98,7 +98,7 @@ function MainApp() {
     // Displays the uploaded images in the image container
     function ImageDisplaySection({ setSelectedImageIndex }) {
         return (
-            <div className="image-container">
+            <div className="test-container">
                 {images.map((image, index) => (
                     <div key={image.id} className="image-item">
                         <img
