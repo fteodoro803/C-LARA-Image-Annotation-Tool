@@ -111,7 +111,7 @@ function MapToolPage({ onBackClick }) {
     }, [lassoSelectEnabled, canvasWidth, canvasHeight]);
 
 
-    // Finds the closest endpoint between a penStroke 
+    // Orders the penStrokes based on distance of endPoints to create a correct connected polygon
     const orderPenStrokes = (penStrokes) => {
         if (penStrokes.length === 1) {
             return penStrokes;
@@ -120,10 +120,13 @@ function MapToolPage({ onBackClick }) {
         let orderedPenStrokes = [];
         let minimumDistance = 10000;
 
+        // Sets currentStroke to the first stroke
         let closestStroke = penStrokes[0];
         let currentStroke = penStrokes[0];
 
         orderedPenStrokes.push(currentStroke);
+
+        // Checks which end/start point of all other strokes is closest to the endpoint of the current stroke
         while (orderedPenStrokes.length < penStrokes.length) {
             let currentEndX = currentStroke.path[currentStroke.path.length - 1].x;
             let currentEndY = currentStroke.path[currentStroke.path.length - 1].y;
@@ -137,7 +140,7 @@ function MapToolPage({ onBackClick }) {
                     let nextStartX = penStrokes[j].path[0].x;
                     let nextStartY = penStrokes[j].path[0].y;
 
-
+                    // Checks the distances between the current stroke's endpoint and the next stroke's end and starting points
                     let endToEnd = Math.abs(currentEndX - nextEndX) +
                         Math.abs(currentEndY - nextEndY);
                     let endToStart = Math.abs(currentEndX - nextStartX) +
@@ -145,10 +148,14 @@ function MapToolPage({ onBackClick }) {
 
                     let closestPoint = endToEnd < endToStart ? endToEnd : endToStart;
 
+                    // If this stroke's end or starting points are closer to the current stroke's endpoints than previously checked
+                    // strokes, set this stroke as the closest stroke
                     if (closestPoint < minimumDistance) {
                         minimumDistance = closestPoint;
                         closestStroke = penStrokes[j];
 
+                        // Reverses the order of coordinates for the closest stroke if its endpoint is closer to the endpoint
+                        // of the current stroke than its starting point
                         if (closestPoint === endToEnd) {
                             closestStroke.path = penStrokes[j].path.reverse();
                         }
@@ -156,6 +163,7 @@ function MapToolPage({ onBackClick }) {
                 }
             }
 
+            // Sets the new current stroke to the closest stroke
             orderedPenStrokes.push(closestStroke);
             currentStroke = closestStroke;
         }
@@ -560,12 +568,13 @@ function MapToolPage({ onBackClick }) {
             </div>
             
 
-            { lassoSelectEnabled && (
+            {/* Provides preview of current lasso selection */}
+            {/* { lassoSelectEnabled && (
                 <>
                     <h3>Preview</h3>
                     <img src={previewImage} alt="Lasso Preview" height={previewHeight}/>
                 </>
-            )}
+            )} */}
 
         </div>
     );
