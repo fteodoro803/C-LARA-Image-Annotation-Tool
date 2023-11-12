@@ -34,6 +34,10 @@ Nicole Penrose (npenrose@student.unimelb.edu.au)
     - Drag to desired location
   - Restart
     - Click on the Image outside of the Selected Area to restart the Process
+   
+## Demo
+  https://github.com/fteodoro803/COMP30022-Team-029/assets/81680451/c02567cf-8373-4476-9b46-97e892ec1481
+
 
 ## Dependencies
 
