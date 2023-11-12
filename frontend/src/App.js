@@ -31,6 +31,7 @@ function MainApp() {
   // Image Upload Constants and Functions
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageName, setImageName] = useState("");
+  
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
@@ -43,6 +44,8 @@ function MainApp() {
     }
   };
 
+
+  // Pushes image file and metadata to backend
   const handleUpload = async () => {
     const formData = new FormData();
     formData.append('image', selectedFile);
@@ -76,6 +79,7 @@ function MainApp() {
   }, []);
 
 
+  // Removes image file and metadata from backend 
   const handleDelete = async (id) => {
     try {
       await Endpoint.delete(`delete/${id}`);
@@ -90,7 +94,8 @@ function MainApp() {
     }
   };
 
-
+  
+  // Displays the uploaded images in the image container
   function ImageDisplaySection({ setSelectedImageIndex }) {
     return (
         <div className="image-container">
@@ -115,6 +120,7 @@ function MainApp() {
   }
 
 
+  // Allows user to proceed to Image Detail page once at least one image has been uploaded
   function handleProceedClick() {
     if (images.length === 0) {
       // Show a popup if there are no images
