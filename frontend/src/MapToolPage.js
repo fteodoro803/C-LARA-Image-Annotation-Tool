@@ -177,6 +177,9 @@ function MapToolPage({ onBackClick }) {
 
             goalArrayJSON = convertArrayFormat(orderedPoints);
         }
+        else {
+            goalArrayJSON = convertArrayFormat([]);
+        }
 
         console.log(goalArrayJSON);
 
