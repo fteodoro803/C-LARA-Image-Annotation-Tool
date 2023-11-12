@@ -136,6 +136,7 @@ class AddCoordinateView(APIView):
     def post(self, request, *args, **kwargs):
         word_id = request.data.get('word_id')
         new_coordinates = request.data.get('coordinates')
+        tool_used = request.data.get('toolUsed')
 
         if word_id:
             word = Word.objects.get(id=word_id)
@@ -146,12 +147,14 @@ class AddCoordinateView(APIView):
 
             # Assuming coordinates is a list of lists
             word.coordinates = new_coordinates
+            word.toolUsed = tool_used
 
             word.save()
             return Response({
                 "message": "Coordinates added successfully!",
                 "word_id": word.id,
-                "coordinates": word.coordinates
+                "coordinates": word.coordinates,
+                "toolUsed": word.toolUsed
             }, status=status.HTTP_201_CREATED)
         else:
             return Response({
@@ -165,9 +168,11 @@ class FetchCoordinatesView(APIView):
         try:
             word = Word.objects.get(id=word_id)
             coordinates = word.coordinates if word.coordinates else []
+            toolUsed = word.toolUsed
             return Response({
                 "word_id": word.id,
-                "coordinates": coordinates
+                "coordinates": coordinates,
+                "toolUsed": toolUsed
             }, status=status.HTTP_200_OK)
 
         except Word.DoesNotExist:
