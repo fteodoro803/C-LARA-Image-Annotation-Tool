@@ -1,0 +1,82 @@
+.map-tool-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 80%; /* Restrict the width */
+    margin: 0 auto; /* Center the container */
+    border: 2px dashed black; /* Outer border */
+    padding: 20px 0; /* Space at the top and bottom */
+}
+
+.top-buttons {
+    display: flex;
+    gap: 10px;
+    background-color: #e0f7fa; /* Teal background color */
+    padding: 10px 20px; /* Spacing around the buttons */
+    border-radius: 5px; /* Rounded edges */
+}
+
+.image-container {
+    border: 2px solid black; /* Image border */
+    width: 80%; /* Adjust this value to your preference */
+    padding: 20px; /* Space inside the border */
+    display: flex;
+    justify-content: center; /* Center the image horizontally */
+}
+
+.image-container img {
+    max-width: 100%; /* Ensure the image doesn't overflow the container */
+}
+
+.selected-word-box {
+    display: flex;
+    background-color: #e0f7fa; /* Teal background color */
+    padding: 10px 20px; /* Spacing around the buttons */
+    border-radius: 5px; /* Rounded edges */
+    gap: 5px;
+    padding: 30px;
+    max-width: fit-content; /* Full width */
+}
+
+
+.top-buttons button {
+    padding: 10px 20px; /* Consistent spacing for buttons */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #80cbc4; /* Teal button color */
+    color: white; /* Text color */
+}
+
+/* Button default style */
+.top-buttons button {
+    margin: 5px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+.top-buttons button.color-button {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border-radius: 50%; /* makes it circular */
+    margin-left: 2px;
+    margin-right: 2px;
+    text-align: center;
+    line-height: 25px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.top-buttons button.color-button:hover {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.top-buttons button.color-button.white {
+    border: 1px solid #aaa; /* making white color button more visible */
+}

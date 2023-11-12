@@ -38,44 +38,45 @@
   }
 }
 
-
-.image-container {
+.images-container {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-wrap: wrap; /* Allows items to wrap to the next line */
+  justify-content: center; /* Centers items horizontally */
+  /*align-items: center; !* Centers items vertically within each line *!*/
   gap: 10px;
   margin-top: 20px;
-}
-
-.word-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.word-box {
-  background-color: lightgray;
-  border: 1px solid gray;
-  padding: 5px;
+  /*width: 100%; !* Takes the full width of its parent *!*/
+  overflow-x: auto; /* Adds horizontal scrolling */
+  border: 2px black solid;
   border-radius: 5px;
 }
 
-
-.image-detail-container {
+.image-item{
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  margin: 10px;
 }
 
-.image-list {
+.image-detail-container {
+  flex: 1;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
+  flex-direction : column;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.image-list, .word-text {
+  display: flex;
+  justify-content: center;
+
+  max-width: fit-content;
+  flex-wrap: wrap;
+  gap: 20px;
+  border: 1px solid gray;
 }
 
 .image-list-item {
@@ -88,60 +89,125 @@
 }
 
 .image-detail {
-  display: flex;
-  align-items: flex-start; /* Align the content at the top */
-  width: 100%;
+  flex: 1;
+  position: relative;
 }
 
 .selected-image-container {
-  width: 65%;
-  max-height: 80vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 .selected-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  max-width: 100%;
+  display: block;
+  margin: 20px 0;
   border: 1px solid gray;
 }
 
 .button-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center horizontally */
-  margin-top: 20px;
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px;
 }
 
-.edit-button {
-  padding: 10px 20px; /* Adjust padding for button size */
-  font-size: 16px; /* Adjust font size for button text */
-  background-color: #007bff; /* Adjust background color */
-  color: white; /* Adjust text color */
+.large-blue-button, .large-grey-button {
+  margin-top: 10px;
+  padding: 10px 20px; /* Add padding for better aesthetics */
+  border: none; /* Removes the default border */
+  color: white; /* Text color */
+  cursor: pointer; /* Hand cursor on hover */
+  border-radius: 4px; /* Rounded corners */
+  font-size: 16px; /* Font size adjustment */
+}
+
+.small-red-button, .small-grey-button, .small-blue-button {
+  padding: 5px 10px;
+  font-size: 16px;
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-left: 250px; /* Adjust the margin to move it towards the left */
-  margin-top: 10px; /* Adjust spacing between buttons */
+  margin-top: 10px;
+}
+
+.large-blue-button, .small-blue-button {
+  background-color: #2196F3; /* Example blue color */
+}
+
+.large-grey-button, .small-grey-button {
+  background-color: #969696; /* Example blue color */
+}
+
+.small-red-button {
+  background-color: #ff6347;
+}
+
+.large-blue-button:hover, .small-blue-button:hover {
+  background-color: #1976D2; /* Darker blue on hover */
+}
+
+.large-grey-button:hover, .small-grey-button:hover {
+  background-color: #737373; /* Darker blue on hover */
+}
+
+.small-red-button:hover {
+  background-color: #d34f38; /* Darker blue on hover */
+}
+
+.word-box {
+  padding: 5px;
+  display: flex; /* Change to display: flex */
+  flex-direction: row;
+  align-items: center; /* Center vertically within the bubble */
+}
+
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* This will align the buttons and inputs in the same column */
+  gap: 10px;            /* Provides spacing between child elements */
+}
+
+.word-item {
+  font-size: 25px; /* Change the font size as needed */
+  margin-right: 10px;
+}
+
+.image-box {
+  width: 100px; /* Adjust as needed */
+  height: 100px; /* Adjust as needed */
+  overflow: hidden;
+}
+
+.image-box img {
+  width: 100%;
+  height: auto;
 }
 
 .spacer {
   height: 20px; /* Adjust the height as needed */
 }
 
-.word-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  gap: 10px;
-  margin-top: 20px;
+/* Style for the word-buttons created after pressing Enter */
+button {
+  background-color: #E0E0E0; /* Example grey color */
+  border: none;
+  margin-right: 5px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.word-box {
-  background-color: lightgray;
-  border: 1px solid gray;
-  padding: 5px;
-  border-radius: 5px;
-  display: flex; /* Change to display: flex */
-  align-items: center; /* Center vertically within the bubble */
+.button-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
 }
