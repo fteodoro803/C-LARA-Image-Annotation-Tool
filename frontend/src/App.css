@@ -38,7 +38,6 @@
   }
 }
 
-
 .image-container {
   flex: 1;
   display: flex;
@@ -48,10 +47,7 @@
   justify-content: center;
   gap: 10px;
   margin-top: 20px;
-
-
 }
-
 
 .image-item{
   display: flex;
@@ -59,38 +55,6 @@
   align-items: center;
   margin: 10px;
 }
-
-.checkbox-label{
-  margin-top: 5px;
-}
-
-.delete-selected-button{
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #ff6347;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-.word-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  gap: 10px;
-  margin-top: 20px;
-}
-
-
-.word-box {
-  background-color: lightgray;
-  border: 1px solid gray;
-  padding: 5px;
-  border-radius: 5px;
-}
-
 
 .image-detail-container {
   flex: 1;
@@ -111,7 +75,6 @@
   flex-wrap: wrap;
   gap: 20px;
   border: 1px solid gray;
-
 }
 
 .image-list-item {
@@ -144,7 +107,7 @@
   display: block;
   margin: 20px 0;
   border: 1px solid gray;
-
+  border: 1px solid gray;
 }
 
 .button-container {
@@ -155,111 +118,84 @@
   gap: 10px;
 }
 
-.edit-button, .map-button {
+.large-blue-button, .large-grey-button {
   margin-top: 10px;
   padding: 10px 20px; /* Add padding for better aesthetics */
   border: none; /* Removes the default border */
-  background-color: #2196F3; /* Example blue color */
   color: white; /* Text color */
   cursor: pointer; /* Hand cursor on hover */
   border-radius: 4px; /* Rounded corners */
   font-size: 16px; /* Font size adjustment */
 }
 
-.word-add-button, .word-map-button {
+.small-red-button, .small-grey-button, .small-blue-button {
+  padding: 5px 10px;
+  font-size: 16px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
   margin-top: 10px;
-  padding: 10px 20px; /* Add padding for better aesthetics */
-  border: none; /* Removes the default border */
-  background-color: #2196F3; /* Example blue color */
-  color: white; /* Text color */
-  cursor: pointer; /* Hand cursor on hover */
-  border-radius: 4px; /* Rounded corners */
-  font-size: 16px; /* Font size adjustment */
 }
 
-.back-button {
-  margin-top: 10px;
-  max-width: fit-content;
-  padding: 10px 20px; /* Add padding for better aesthetics */
-  border: none; /* Removes the default border */
+.large-blue-button, .small-blue-button {
   background-color: #2196F3; /* Example blue color */
-  color: white; /* Text color */
-  cursor: pointer; /* Hand cursor on hover */
-  border-radius: 4px; /* Rounded corners */
-  font-size: 16px; /* Font size adjustment */
 }
 
-.word-edit-button, .word-delete-button {
-  margin-top: 10px;
-  padding: 10px 20px; /* Add padding for better aesthetics */
-  border: none; /* Removes the default border */
+.large-grey-button, .small-grey-button {
   background-color: #969696; /* Example blue color */
-  color: white; /* Text color */
-  cursor: pointer; /* Hand cursor on hover */
-  border-radius: 4px; /* Rounded corners */
-  font-size: 16px; /* Font size adjustment */
 }
 
-.map-button {
-  background-color: #007bff;
+.small-red-button {
+  background-color: #ff6347;
 }
 
-.image-box {
-  width: 100px; /* Adjust as needed */
-  height: 100px; /* Adjust as needed */
-  overflow: hidden;
-
-}
-
-.image-box img {
-  width: 100%;
-  height: auto;
-
-}
-
-
-.spacer {
-  height: 20px; /* Adjust the height as needed */
-}
-
-
-.edit-button:hover, .map-button:hover {
+.large-blue-button:hover, .small-blue-button:hover {
   background-color: #1976D2; /* Darker blue on hover */
 }
 
+.large-grey-button:hover, .small-grey-button:hover {
+  background-color: #737373; /* Darker blue on hover */
+}
+
+.small-red-button:hover {
+  background-color: #d34f38; /* Darker blue on hover */
+}
+
 .word-box {
-  background-color: lightgray;
-  border: 1px solid gray;
   padding: 5px;
-  border-radius: 5px;
   display: flex; /* Change to display: flex */
+  flex-direction: row;
   align-items: center; /* Center vertically within the bubble */
-}
-
-.word-input-container {
-  display: flex;
-  gap: 10px; /* Space between inputs */
-}
-
-.word-input {
-  padding: 5px;
-}
-
-.editable-word {
-  padding: 5px;
-  border: 1px solid gray;
-  border-radius: 5px;
-  margin-right: 10px;
 }
 
 .controls-container {
   display: flex;
   flex-direction: column;
   align-items: center;  /* This will align the buttons and inputs in the same column */
-  gap: 20px;            /* Provides spacing between child elements */
+  gap: 10px;            /* Provides spacing between child elements */
 }
 
-  
+.word-item {
+  font-size: 25px; /* Change the font size as needed */
+  margin-right: 10px;
+}
+
+.image-box {
+  width: 100px; /* Adjust as needed */
+  height: 100px; /* Adjust as needed */
+  overflow: hidden;
+}
+
+.image-box img {
+  width: 100%;
+  height: auto;
+}
+
+.spacer {
+  height: 20px; /* Adjust the height as needed */
+}
+
 /* Style for the word-buttons created after pressing Enter */
 button {
   background-color: #E0E0E0; /* Example grey color */
@@ -274,4 +210,3 @@ button {
   justify-content: center;
   margin-top: 10px;
 }
-

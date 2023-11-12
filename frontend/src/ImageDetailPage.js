@@ -149,11 +149,11 @@ function ImageDetailPage() {
     navigate('/');
   };
 
-  
+
   return (
 
       <div className="image-detail-container">
-        <button className="back-button" onClick={handleBackButtonClick}>Back To Upload Page</button>
+        <button className="large-blue-button" onClick={handleBackButtonClick}>Back To Upload Page</button>
         <h2>Select Image:</h2>
         <div className="image-list">
           {images.map((imageObj, index) => (
@@ -165,10 +165,11 @@ function ImageDetailPage() {
 
         {selectedImage && (
             <div className="selected-image-container">
-              <img height={'400px'} width={'auto'} src={selectedImage.file} alt="Selected" />
-
+              <div className="selected-image">
+                <img height={'400px'} width={'auto'} src={selectedImage.file} alt="Selected" />
+              </div>
               <div className="controls-container">
-                <button className="word-add-button" onClick={handleWordAdd}>Add Word</button>
+                <button className="large-blue-button" onClick={handleWordAdd}>Add Word</button>
                 {isEditingMode ? (
                     editedWords.map((word, index) => (
                         <input
@@ -186,10 +187,12 @@ function ImageDetailPage() {
                 ) : (
                     <>
                       {words.map(word => (
-                          <div key={word.id}>
-                            {word.word}
+                          <div className="word-box" key={word.id}>
+                            <div className="word-item">
+                              {word.word}
+                            </div>
                             <button
-                                className="word-edit-button"
+                                className="small-grey-button"
                                 onClick={() => {
                                   const newWord = prompt("Edit word:", word.word);
                                   if (newWord) {
@@ -199,8 +202,8 @@ function ImageDetailPage() {
                             >
                               Edit
                             </button>
-                            <button className="word-delete-button" onClick={() => handleWordDelete(word.id)}>Delete</button>
-                            <button className="word-map-button" onClick={() => handleMapButtonClick(selectedImage, word)}>Map</button>
+                            <button className="small-red-button" onClick={() => handleWordDelete(word.id)}>Delete</button>
+                            <button className="small-blue-button" onClick={() => handleMapButtonClick(selectedImage, word)}>Map</button>
                           </div>
                       ))}
                     </>
