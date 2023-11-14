@@ -132,8 +132,7 @@ with a placeholder Backend Environment:
      - Proceed.test.js
   - ImageDetailPage unit tests
     - Words.test.js
-  - MapToolPage unit tests
-    - MapTools.test.js
+  
 
 Testing is still in progress, but is being updated continually in the following Confluence documents:
 - [Traceability Matrices](https://team029.atlassian.net/l/cp/as2ChHS7)
