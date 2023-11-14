@@ -124,6 +124,17 @@ Backend testing was conducted in [database-testing]
   - testModels.py
   - testViews.py
 
+Frontend unit testing was conducted in the Frontend directory
+with a placeholder Backend Environment:
+- Test Cases in `frontend/src/tests` directory:
+  - Upload page unit tests
+     Upload.test.js
+     Proceed.test.js
+  - ImageDetailPage unit tests
+    Words.test.js
+  - MapToolPage unit tests
+    MapTools.test.js
+
 Testing is still in progress, but is being updated continually in the following Confluence documents:
 - [Traceability Matrices](https://team029.atlassian.net/l/cp/as2ChHS7)
 - [Front-End Testing Strategy](https://team029.atlassian.net/l/cp/kHBpHiFr)
