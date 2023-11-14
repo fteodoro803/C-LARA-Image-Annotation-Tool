@@ -126,7 +126,7 @@ Backend testing was conducted in [database-testing]
 
 Frontend unit testing was conducted in the Frontend directory
 with a placeholder Backend Environment:
-- Test Cases in `frontend/src/tests` directory:
+- Test Cases in `frontend/src` directory:
   - Upload page unit tests
      - Upload.test.js
      - Proceed.test.js
