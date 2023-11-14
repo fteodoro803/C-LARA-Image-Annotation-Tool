@@ -128,12 +128,12 @@ Frontend unit testing was conducted in the Frontend directory
 with a placeholder Backend Environment:
 - Test Cases in `frontend/src/tests` directory:
   - Upload page unit tests
-     Upload.test.js
-     Proceed.test.js
+     - Upload.test.js
+     - Proceed.test.js
   - ImageDetailPage unit tests
-    Words.test.js
+    - Words.test.js
   - MapToolPage unit tests
-    MapTools.test.js
+    - MapTools.test.js
 
 Testing is still in progress, but is being updated continually in the following Confluence documents:
 - [Traceability Matrices](https://team029.atlassian.net/l/cp/as2ChHS7)
